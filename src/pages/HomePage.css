@@ -1,0 +1,223 @@
+.hero-section {
+  background-color: var(--bg-hero);
+  color: var(--text-on-dark);
+  padding-block: var(--space-10);
+  border-bottom: 3px solid var(--border-strong);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .hero-section {
+    padding-block: var(--space-16);
+  }
+
+  .hero-grid {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+}
+
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(238, 235, 218, 0.35);
+  background-color: rgba(238, 235, 218, 0.12);
+  color: var(--vanilla-200);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.hero-title {
+  color: var(--vanilla-200);
+  font-size: clamp(2rem, 5vw, 3.1rem);
+  margin: 0;
+}
+
+.hero-subtitle {
+  color: #dcd8c3;
+  font-size: 1.05rem;
+  max-width: 58ch;
+  margin: 0;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.hero-btn-primary {
+  background-color: var(--vanilla-200);
+  color: var(--indigo-800);
+  border-color: var(--vanilla-200);
+}
+
+.hero-btn-primary:hover {
+  background-color: #ffffff;
+  color: var(--indigo-950);
+}
+
+.hero-btn-secondary {
+  background-color: transparent;
+  color: var(--vanilla-200);
+  border-color: rgba(238, 235, 218, 0.55);
+}
+
+.hero-btn-secondary:hover {
+  background-color: rgba(238, 235, 218, 0.14);
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(238, 235, 218, 0.22);
+}
+
+@media (min-width: 540px) {
+  .hero-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.hero-stat-item {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.hero-stat-item dt {
+  font-size: 0.82rem;
+  color: #ccc8b3;
+}
+
+.hero-stat-item dd {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--vanilla-200);
+}
+
+.hero-figure {
+  margin: 0;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 2px solid rgba(238, 235, 218, 0.25);
+  box-shadow: var(--shadow-lg);
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.project-card-thumb {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.card-heading {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.card-heading a {
+  text-decoration: none;
+}
+
+.card-heading a:hover {
+  text-decoration: underline;
+}
+
+.card-muted {
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.home-band-alt {
+  background-color: var(--bg-surface-alt);
+  border-block: 1px solid var(--border-color);
+}
+
+.community-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.card-meta-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.community-schedule {
+  margin: auto 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.home-faq-container {
+  max-width: 860px;
+}
+
+.home-cta-band {
+  padding-top: 0;
+}
+
+.home-cta-card {
+  background-color: var(--bg-surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  justify-content: space-between;
+  align-items: flex-start;
+  box-shadow: var(--shadow-sm);
+}
+
+.home-cta-card h2 {
+  margin-bottom: var(--space-2);
+}
+
+.home-cta-card p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.home-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .home-cta-card {
+    flex-direction: row;
+    align-items: center;
+    padding: var(--space-8);
+  }
+}

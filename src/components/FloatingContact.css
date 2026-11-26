@@ -1,0 +1,117 @@
+.floating-contact {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: calc(var(--z-floating) + 10);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.floating-contact-trigger {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--accent-primary);
+  background-color: var(--accent-primary);
+  color: var(--text-on-accent);
+  box-shadow: var(--shadow-md);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.floating-contact-trigger:hover {
+  transform: translateY(-2px);
+  background-color: var(--accent-primary-hover);
+  box-shadow: var(--shadow-lg);
+}
+
+.floating-contact-panel {
+  position: absolute;
+  bottom: calc(100% + var(--space-3));
+  right: 0;
+  width: min(300px, calc(100vw - 2rem));
+  background-color: var(--bg-surface-elevated);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.floating-contact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.floating-contact-header h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.floating-contact-close {
+  width: 44px;
+  height: 44px;
+  margin: -0.5rem -0.5rem -0.5rem 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: 1.4rem;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-contact-close:hover {
+  background-color: var(--accent-soft);
+  color: var(--text-primary);
+}
+
+.floating-contact-hours {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.floating-contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.floating-contact-link {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-alt);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  overflow-wrap: anywhere;
+}
+
+.floating-contact-link:hover {
+  background-color: var(--accent-soft);
+  opacity: 1;
+}
+
+@media (min-width: 768px) {
+  .floating-contact {
+    right: var(--space-6);
+    bottom: var(--space-5);
+  }
+}

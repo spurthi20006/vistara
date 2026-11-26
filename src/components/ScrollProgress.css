@@ -1,0 +1,20 @@
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: var(--z-progress);
+  background-color: transparent;
+  pointer-events: none;
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  background-color: var(--indigo-800);
+  transition: width 80ms linear;
+}
+
+:root[data-theme='dark'] .scroll-progress-bar {
+  background-color: var(--vanilla-200);
+}

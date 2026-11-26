@@ -1,0 +1,64 @@
+@media print {
+  /* Hide non-printable chrome and interactive widgets */
+  .site-header,
+  .site-footer,
+  .cookie-banner,
+  .back-to-top,
+  .floating-contact,
+  .scroll-progress,
+  .skip-link,
+  .toast-region,
+  .mobile-menu-overlay,
+  .no-print,
+  button,
+  .btn {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .card,
+  .profile-panel,
+  .project-detail-card {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #999999 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  li,
+  span,
+  a {
+    color: #000000 !important;
+  }
+
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 9pt;
+    word-break: break-all;
+  }
+
+  .tag {
+    background: #ffffff !important;
+    border: 1px solid #444444 !important;
+    color: #000000 !important;
+  }
+}

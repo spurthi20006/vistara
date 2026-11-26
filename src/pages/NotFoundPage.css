@@ -1,0 +1,26 @@
+.not-found-container {
+  max-width: 640px;
+}
+
+.not-found-card {
+  padding: var(--space-8);
+  align-items: flex-start;
+}
+
+.not-found-code {
+  display: inline-flex;
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--indigo-800);
+  color: var(--vanilla-200);
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}

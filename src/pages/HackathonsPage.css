@@ -1,0 +1,40 @@
+.hackathons-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.hackathon-selected {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.hackathon-meta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.hackathon-form-card {
+  padding: var(--space-6);
+}
+
+.hackathon-form-card h2 {
+  margin-bottom: var(--space-3);
+}
+
+.applications-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.application-lead {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.application-lead a {
+  overflow-wrap: anywhere;
+}

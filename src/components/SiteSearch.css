@@ -1,0 +1,107 @@
+.site-search {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.site-search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.site-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.site-search-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.85rem 0.5rem 2.4rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border-strong);
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.site-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.site-search-dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  right: 0;
+  z-index: var(--z-dropdown);
+  background-color: var(--bg-surface-elevated);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 360px;
+  overflow-y: auto;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.site-search-option {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.site-search-option:hover,
+.site-search-option.is-active {
+  background-color: var(--accent-soft);
+}
+
+.site-search-badge {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--accent-primary);
+  color: var(--text-on-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.site-search-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.site-search-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.site-search-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.site-search-empty {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
