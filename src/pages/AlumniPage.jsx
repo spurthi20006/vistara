@@ -7,7 +7,7 @@ import { useToast } from '../hooks/useToast';
 import './DirectoryPages.css';
 
 export function AlumniPage() {
-  const { alumni } = useAppData();
+  const { alumni, currentUser } = useAppData();
   const { showToast } = useToast();
   const [department, setDepartment] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,6 +38,9 @@ export function AlumniPage() {
   }, [alumni, department, searchTerm]);
 
   const handleRequestMentorship = (person) => {
+    if (currentUser?.role === 'alumni') {
+      return;
+    }
     if (requestedIds.includes(person.id)) {
       showToast({
         type: 'info',
@@ -164,13 +167,15 @@ export function AlumniPage() {
                     <Link to={`/alumni/${person.id}`} className="btn btn-outline btn-sm">
                       View Profile
                     </Link>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${requested ? 'btn-secondary' : 'btn-primary'}`}
-                      onClick={() => handleRequestMentorship(person)}
-                    >
-                      {requested ? 'Mentorship Requested' : 'Request Mentorship'}
-                    </button>
+                    {currentUser?.role !== 'alumni' && (
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${requested ? 'btn-secondary' : 'btn-primary'}`}
+                        onClick={() => handleRequestMentorship(person)}
+                      >
+                        {requested ? 'Mentorship Requested' : 'Request Mentorship'}
+                      </button>
+                    )}
                   </div>
                 </article>
               );
