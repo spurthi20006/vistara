@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { ToastProvider } from './context/ToastContext';
-import { AppDataProvider } from './context/AppDataContext';
+import { AppDataProvider, useAppData } from './context/AppDataContext';
 import { Layout } from './components/Layout';
 import { captureUtmParams } from './utils/utm';
 import { HomePage } from './pages/HomePage';
@@ -33,6 +33,14 @@ function RouteEffects() {
   return null;
 }
 
+function ProtectedRoute({ children }) {
+  const { currentUser } = useAppData();
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
 export function App() {
   return (
     <HelmetProvider>
@@ -42,19 +50,20 @@ export function App() {
             <RouteEffects />
             <Layout>
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/alumni" element={<AlumniPage />} />
-                <Route path="/alumni/:id" element={<ProfileDetailPage kind="alumni" />} />
-                <Route path="/students" element={<StudentsPage />} />
-                <Route path="/students/:id" element={<ProfileDetailPage kind="student" />} />
-                <Route path="/communities" element={<CommunitiesPage />} />
-                <Route path="/projects" element={<ProjectsPage />} />
-                <Route path="/projects/:id" element={<ProjectDetailPage />} />
-                <Route path="/questions" element={<QuestionsPage />} />
-                <Route path="/hackathons" element={<HackathonsPage />} />
-                <Route path="/profile" element={<MyProfilePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+
+                <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+                <Route path="/alumni" element={<ProtectedRoute><AlumniPage /></ProtectedRoute>} />
+                <Route path="/alumni/:id" element={<ProtectedRoute><ProfileDetailPage kind="alumni" /></ProtectedRoute>} />
+                <Route path="/students" element={<ProtectedRoute><StudentsPage /></ProtectedRoute>} />
+                <Route path="/students/:id" element={<ProtectedRoute><ProfileDetailPage kind="student" /></ProtectedRoute>} />
+                <Route path="/communities" element={<ProtectedRoute><CommunitiesPage /></ProtectedRoute>} />
+                <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+                <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
+                <Route path="/questions" element={<ProtectedRoute><QuestionsPage /></ProtectedRoute>} />
+                <Route path="/hackathons" element={<ProtectedRoute><HackathonsPage /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><MyProfilePage /></ProtectedRoute>} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Layout>

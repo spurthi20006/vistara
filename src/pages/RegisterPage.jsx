@@ -25,7 +25,6 @@ export function RegisterPage() {
     confirmPassword: '',
   });
   const [errors, setErrors] = useState({});
-  const [registeredPayload, setRegisteredPayload] = useState(null);
 
   const refs = {
     name: useRef(null),
@@ -85,13 +84,12 @@ export function RegisterPage() {
     };
 
     registerUser(registrationRequestPayload);
-    setRegisteredPayload(registrationRequestPayload);
-    setErrors({});
     showToast({
       type: 'success',
       title: 'Registration successful',
       message: `Account created for ${registrationRequestPayload.name}.`,
     });
+    navigate('/');
   };
 
   const errorEntries = Object.entries(errors);
@@ -112,7 +110,7 @@ export function RegisterPage() {
             </p>
           </div>
 
-          {hasUtm && !registeredPayload && (
+          {hasUtm && (
             <div className="utm-notice" role="note">
               <strong>Referral Attribution Captured:</strong>{' '}
               {[
@@ -125,27 +123,7 @@ export function RegisterPage() {
             </div>
           )}
 
-          {registeredPayload ? (
-            <div className="form-success-card" role="status">
-              <h2>Account Created Successfully</h2>
-              <p>
-                Welcome to University Connect, <strong>{registeredPayload.name}</strong>! Your
-                profile is ready under <strong>{registeredPayload.department}</strong>.
-              </p>
-              <pre className="payload-preview">
-                {JSON.stringify(registeredPayload, null, 2)}
-              </pre>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => navigate('/profile')}
-              >
-                Continue to My Profile
-              </button>
-            </div>
-          ) : (
-            <>
-              <form className="form-stack" onSubmit={handleSubmit} noValidate>
+          <form className="form-stack" onSubmit={handleSubmit} noValidate>
                 {errorEntries.length > 0 && (
                   <div className="error-summary" role="alert">
                     <h3>Please fix {errorEntries.length} registration error(s):</h3>
@@ -300,8 +278,6 @@ export function RegisterPage() {
               <p className="auth-switch-link">
                 Already registered? <Link to="/login">Sign in to your account</Link>
               </p>
-            </>
-          )}
         </div>
       </div>
     </section>

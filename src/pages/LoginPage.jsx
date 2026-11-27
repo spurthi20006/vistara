@@ -15,7 +15,6 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [roleChoice, setRoleChoice] = useState('student');
   const [errors, setErrors] = useState({});
-  const [signedInUser, setSignedInUser] = useState(null);
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
@@ -48,12 +47,12 @@ export function LoginPage() {
     }
 
     const user = loginAsRole(roleChoice, email);
-    setSignedInUser(user);
     showToast({
       type: 'success',
       title: 'Welcome back',
       message: `Signed in as ${user.name} (${user.roleLabel}).`,
     });
+    navigate('/');
   };
 
   const errorEntries = Object.entries(errors);
@@ -73,29 +72,7 @@ export function LoginPage() {
             </p>
           </div>
 
-          {signedInUser ? (
-            <div className="form-success-card" role="status">
-              <h2>Signed In Successfully</h2>
-              <p>
-                Welcome back, <strong>{signedInUser.name}</strong> ({signedInUser.roleLabel}).
-                Your navigation menu now reflects your active account role.
-              </p>
-              <div className="card-actions-row">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => navigate('/profile')}
-                >
-                  Continue to My Profile
-                </button>
-                <Link to="/hackathons" className="btn btn-outline">
-                  Go to Hackathons
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <>
-              <form className="form-stack" onSubmit={handleSubmit} noValidate>
+          <form className="form-stack" onSubmit={handleSubmit} noValidate>
                 {errorEntries.length > 0 && (
                   <div className="error-summary" role="alert">
                     <h3>Unable to sign in ({errorEntries.length} error(s)):</h3>
@@ -166,8 +143,6 @@ export function LoginPage() {
               <p className="auth-switch-link">
                 New to campus? <Link to="/register">Create a University Connect account</Link>
               </p>
-            </>
-          )}
         </div>
       </div>
     </section>

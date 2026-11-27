@@ -56,9 +56,9 @@ export function Navbar() {
     showToast({
       type: 'info',
       title: 'Signed out',
-      message: 'You are now browsing as a guest.',
+      message: 'Please sign in to your student or alumni account.',
     });
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -71,7 +71,7 @@ export function Navbar() {
           <span className="brand-text">University Connect</span>
         </Link>
 
-        {!isAuthPage && (
+        {currentUser && !isAuthPage && (
           <div className="navbar-desktop-search">
             <SiteSearch />
           </div>
@@ -128,7 +128,7 @@ export function Navbar() {
             </div>
           )}
 
-          {!isAuthPage && (
+          {currentUser && !isAuthPage && (
             <button
               type="button"
               className="hamburger-btn"
@@ -150,7 +150,7 @@ export function Navbar() {
         </div>
       </div>
 
-      {!isAuthPage && (
+      {currentUser && !isAuthPage && (
         <>
           <div className="container navbar-mobile-search">
             <SiteSearch />

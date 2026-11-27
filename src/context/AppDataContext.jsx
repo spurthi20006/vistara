@@ -64,7 +64,7 @@ const DEFAULT_MEMBER_PROFILES = {
 };
 
 export function AppDataProvider({ children }) {
-  const [currentUser, setCurrentUser] = useLocalStorage('uc-current-user', DEFAULT_MEMBER_PROFILES.student);
+  const [currentUser, setCurrentUser] = useLocalStorage('uc-current-user', null);
   const [alumni] = useState(INITIAL_ALUMNI);
   const [students] = useState(INITIAL_STUDENTS);
   const [communities, setCommunities] = useState(INITIAL_COMMUNITIES);

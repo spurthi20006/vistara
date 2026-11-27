@@ -44,8 +44,7 @@ export function MyProfilePage() {
           <div className="card">
             <h1>Sign in to view your profile</h1>
             <p className="card-muted">
-              You are currently browsing as a guest. Sign in with your campus account to update
-              your skills, bio, and portfolio links.
+              Sign in with your student or alumni account to update your skills, bio, and portfolio links.
             </p>
             <div className="card-actions-row">
               <Link to="/login" className="btn btn-primary">
