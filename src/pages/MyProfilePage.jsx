@@ -11,9 +11,13 @@ export function MyProfilePage() {
   const { currentUser, updateCurrentUserProfile, toggleTeammateStatus, hackathons } = useAppData();
   const { showToast } = useToast();
 
+  const isAlumni = currentUser?.role === 'alumni';
+
   const [formState, setFormState] = useState(() => ({
     name: currentUser?.name || '',
     email: currentUser?.email || '',
+    jobRole: currentUser?.jobRole || (isAlumni ? 'Senior Backend Engineer' : ''),
+    company: currentUser?.company || (isAlumni ? 'Razorpay' : ''),
     phoneDisplay: currentUser?.phoneDisplay || '',
     department: currentUser?.department || '',
     githubUrl: currentUser?.githubUrl || '',
@@ -28,6 +32,8 @@ export function MyProfilePage() {
   const refs = {
     name: useRef(null),
     email: useRef(null),
+    jobRole: useRef(null),
+    company: useRef(null),
     phoneDisplay: useRef(null),
     githubUrl: useRef(null),
     portfolioUrl: useRef(null),
@@ -63,24 +69,51 @@ export function MyProfilePage() {
 
   const validateProfile = () => {
     const nextErrors = {};
-    if (formState.name.trim().length < 2) {
-      nextErrors.name = 'Enter your full name (at least 2 characters).';
+
+    if (isAlumni) {
+      // Mandatory for alumni: Job Role & Company
+      if (!formState.jobRole.trim()) {
+        nextErrors.jobRole = 'Job role is mandatory for alumni mentors.';
+      }
+      if (!formState.company.trim()) {
+        nextErrors.company = 'Company is mandatory for alumni mentors.';
+      }
+
+      // All other fields are optional for alumni:
+      if (formState.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email.trim())) {
+        nextErrors.email = 'Enter a valid email address.';
+      }
+      if (formState.phoneDisplay.trim() && !/^\+?[\d\s-]{8,18}$/.test(formState.phoneDisplay.trim())) {
+        nextErrors.phoneDisplay = 'Enter a valid phone number (e.g. +91 98204 51730).';
+      }
+      if (formState.githubUrl.trim() && !/^https?:\/\/.+/i.test(formState.githubUrl.trim())) {
+        nextErrors.githubUrl = 'Enter a valid GitHub URL starting with https:// or http://.';
+      }
+      if (formState.portfolioUrl.trim() && !/^https?:\/\/.+/i.test(formState.portfolioUrl.trim())) {
+        nextErrors.portfolioUrl = 'Enter a valid portfolio URL starting with https:// or http://.';
+      }
+    } else {
+      // Standard validation for students and other campus accounts
+      if (formState.name.trim().length < 2) {
+        nextErrors.name = 'Enter your full name (at least 2 characters).';
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email.trim())) {
+        nextErrors.email = 'Enter a valid email address.';
+      }
+      if (!/^\+?[\d\s-]{8,18}$/.test(formState.phoneDisplay.trim())) {
+        nextErrors.phoneDisplay = 'Enter a valid phone number including country code (e.g. +91 98204 51730).';
+      }
+      if (!/^https?:\/\/.+/i.test(formState.githubUrl.trim())) {
+        nextErrors.githubUrl = 'Enter a valid GitHub URL starting with https:// or http://.';
+      }
+      if (!/^https?:\/\/.+/i.test(formState.portfolioUrl.trim())) {
+        nextErrors.portfolioUrl = 'Enter a valid portfolio URL starting with https:// or http://.';
+      }
+      if (formState.bio.trim().length < 15) {
+        nextErrors.bio = 'Write a short bio of at least 15 characters.';
+      }
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email.trim())) {
-      nextErrors.email = 'Enter a valid email address.';
-    }
-    if (!/^\+?[\d\s-]{8,18}$/.test(formState.phoneDisplay.trim())) {
-      nextErrors.phoneDisplay = 'Enter a valid phone number including country code (e.g. +91 98204 51730).';
-    }
-    if (!/^https?:\/\/.+/i.test(formState.githubUrl.trim())) {
-      nextErrors.githubUrl = 'Enter a valid GitHub URL starting with https:// or http://.';
-    }
-    if (!/^https?:\/\/.+/i.test(formState.portfolioUrl.trim())) {
-      nextErrors.portfolioUrl = 'Enter a valid portfolio URL starting with https:// or http://.';
-    }
-    if (formState.bio.trim().length < 15) {
-      nextErrors.bio = 'Write a short bio of at least 15 characters.';
-    }
+
     return nextErrors;
   };
 
@@ -104,8 +137,10 @@ export function MyProfilePage() {
     }
 
     updateCurrentUserProfile({
-      name: formState.name.trim(),
-      email: formState.email.trim(),
+      name: formState.name.trim() || currentUser.name,
+      email: formState.email.trim() || currentUser.email,
+      jobRole: formState.jobRole.trim(),
+      company: formState.company.trim(),
       phoneDisplay: formState.phoneDisplay.trim(),
       department: formState.department.trim(),
       githubUrl: formState.githubUrl.trim(),
@@ -146,6 +181,17 @@ export function MyProfilePage() {
         </div>
 
         <article className="card profile-panel">
+          {/* Alumni Mentor Role & Company Highlight */}
+          {isAlumni && (
+            <div className="alumni-hero-banner">
+              <span className="tag">Verified Alumni Mentor</span>
+              <h2 className="alumni-role-title">
+                {currentUser.jobRole || 'Senior Backend Engineer'}
+                <span className="alumni-company-text"> at {currentUser.company || 'Razorpay'}</span>
+              </h2>
+            </div>
+          )}
+
           {/* Hackathon Teammate Status Banner for Students */}
           {currentUser.role === 'student' && (
             <div className="hackathon-status-card">
@@ -244,10 +290,60 @@ export function MyProfilePage() {
                 </div>
               )}
 
+              {isAlumni && (
+                <div className="two-col-grid">
+                  <div className="form-field">
+                    <label htmlFor="prof-role" className="form-label">
+                      Job Role <span className="field-required">*</span>
+                    </label>
+                    <input
+                      ref={refs.jobRole}
+                      id="prof-role"
+                      type="text"
+                      className={`form-input ${errors.jobRole ? 'input-invalid' : ''}`}
+                      value={formState.jobRole}
+                      onChange={(e) => setFormState({ ...formState, jobRole: e.target.value })}
+                      aria-invalid={Boolean(errors.jobRole)}
+                      aria-describedby={errors.jobRole ? 'prof-role-err' : undefined}
+                      placeholder="e.g. Senior Backend Engineer"
+                      required
+                    />
+                    {errors.jobRole && (
+                      <span id="prof-role-err" className="field-error">
+                        {errors.jobRole}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="form-field">
+                    <label htmlFor="prof-company" className="form-label">
+                      Company / Organization <span className="field-required">*</span>
+                    </label>
+                    <input
+                      ref={refs.company}
+                      id="prof-company"
+                      type="text"
+                      className={`form-input ${errors.company ? 'input-invalid' : ''}`}
+                      value={formState.company}
+                      onChange={(e) => setFormState({ ...formState, company: e.target.value })}
+                      aria-invalid={Boolean(errors.company)}
+                      aria-describedby={errors.company ? 'prof-company-err' : undefined}
+                      placeholder="e.g. Razorpay, Qualcomm, Atlassian"
+                      required
+                    />
+                    {errors.company && (
+                      <span id="prof-company-err" className="field-error">
+                        {errors.company}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="two-col-grid">
                 <div className="form-field">
                   <label htmlFor="prof-name" className="form-label">
-                    Full Name
+                    Full Name {isAlumni && <span className="field-optional">(Optional)</span>}
                   </label>
                   <input
                     ref={refs.name}
@@ -268,7 +364,7 @@ export function MyProfilePage() {
 
                 <div className="form-field">
                   <label htmlFor="prof-email" className="form-label">
-                    University Email
+                    University Email {isAlumni && <span className="field-optional">(Optional)</span>}
                   </label>
                   <input
                     ref={refs.email}
@@ -291,7 +387,7 @@ export function MyProfilePage() {
               <div className="two-col-grid">
                 <div className="form-field">
                   <label htmlFor="prof-phone" className="form-label">
-                    Phone Number
+                    Phone Number {isAlumni && <span className="field-optional">(Optional)</span>}
                   </label>
                   <input
                     ref={refs.phoneDisplay}
@@ -312,7 +408,7 @@ export function MyProfilePage() {
 
                 <div className="form-field">
                   <label htmlFor="prof-dept" className="form-label">
-                    Department
+                    Department {isAlumni && <span className="field-optional">(Optional)</span>}
                   </label>
                   <input
                     id="prof-dept"
@@ -327,7 +423,7 @@ export function MyProfilePage() {
               <div className="two-col-grid">
                 <div className="form-field">
                   <label htmlFor="prof-github" className="form-label">
-                    GitHub URL
+                    GitHub URL {isAlumni && <span className="field-optional">(Optional)</span>}
                   </label>
                   <input
                     ref={refs.githubUrl}
@@ -348,7 +444,7 @@ export function MyProfilePage() {
 
                 <div className="form-field">
                   <label htmlFor="prof-portfolio" className="form-label">
-                    Portfolio URL
+                    Portfolio URL {isAlumni && <span className="field-optional">(Optional)</span>}
                   </label>
                   <input
                     ref={refs.portfolioUrl}
@@ -370,7 +466,7 @@ export function MyProfilePage() {
 
               <div className="form-field">
                 <label htmlFor="prof-skills" className="form-label">
-                  Skills (comma-separated)
+                  Skills (comma-separated) {isAlumni && <span className="field-optional">(Optional)</span>}
                 </label>
                 <input
                   id="prof-skills"
@@ -403,7 +499,7 @@ export function MyProfilePage() {
 
               <div className="form-field">
                 <label htmlFor="prof-bio" className="form-label">
-                  Bio
+                  Bio {isAlumni && <span className="field-optional">(Optional)</span>}
                 </label>
                 <textarea
                   ref={refs.bio}

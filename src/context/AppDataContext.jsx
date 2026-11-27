@@ -38,6 +38,8 @@ const DEFAULT_MEMBER_PROFILES = {
     email: 'aarav.mehta@universityconnect.edu.in',
     role: 'alumni',
     roleLabel: 'Alumni Mentor',
+    jobRole: 'Senior Backend Engineer',
+    company: 'Razorpay',
     department: 'Computer Science & Engineering',
     yearOrBatch: 'Class of 2020',
     phoneDisplay: '+91 98204 51731',
@@ -68,7 +70,7 @@ const DEFAULT_MEMBER_PROFILES = {
 
 export function AppDataProvider({ children }) {
   const [currentUser, setCurrentUser] = useLocalStorage('uc-current-user', null);
-  const [alumni] = useState(INITIAL_ALUMNI);
+  const [alumni, setAlumni] = useState(INITIAL_ALUMNI);
   const [students, setStudents] = useState(INITIAL_STUDENTS);
   const [communities, setCommunities] = useState(INITIAL_COMMUNITIES);
   const [projects, setProjects] = useState(INITIAL_PROJECTS);
@@ -123,16 +125,29 @@ export function AppDataProvider({ children }) {
     (updates) => {
       setCurrentUser((prev) => {
         if (!prev) return prev;
-        const cleanDigits = (updates.phoneDisplay || prev.phoneDisplay).replace(/[^\d+]/g, '');
+        const cleanDigits = (updates.phoneDisplay || prev.phoneDisplay || '').replace(/[^\d+]/g, '');
         const updated = {
           ...prev,
           ...updates,
-          phoneHref: `tel:${cleanDigits}`,
+          phoneHref: cleanDigits ? `tel:${cleanDigits}` : prev.phoneHref,
           updatedAt: new Date().toISOString().slice(0, 10),
         };
         // Also update matching student record if current user is student
         setStudents((sList) =>
           sList.map((s) => (s.id === prev.id ? { ...s, ...updated } : s))
+        );
+        // Also update matching alumni record if current user is alumni
+        setAlumni((aList) =>
+          aList.map((a) =>
+            a.id === prev.id
+              ? {
+                  ...a,
+                  ...updated,
+                  role: updates.jobRole || a.role,
+                  company: updates.company || a.company,
+                }
+              : a
+          )
         );
         return updated;
       });

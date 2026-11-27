@@ -101,3 +101,40 @@
 .text-success {
   color: var(--success-color);
 }
+
+/* Alumni hero banner on profile dashboard */
+.alumni-hero-banner {
+  background-color: var(--bg-surface-elevated);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.alumni-role-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.alumni-company-text {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.field-required {
+  color: #d9383a;
+  margin-left: 0.25rem;
+  font-weight: 700;
+}
+
+.field-optional {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  font-weight: normal;
+  margin-left: 0.35rem;
+}
