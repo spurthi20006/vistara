@@ -64,13 +64,6 @@ export function ProjectDetailPage() {
           <div className="card-actions-row">
             <button
               type="button"
-              className="btn btn-outline btn-sm"
-              onClick={() => window.print()}
-            >
-              Print Project Brief
-            </button>
-            <button
-              type="button"
               className="btn btn-danger btn-sm"
               onClick={() => setConfirmOpen(true)}
             >

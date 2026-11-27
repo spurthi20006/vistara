@@ -142,13 +142,6 @@ export function MyProfilePage() {
               Signed in as <strong>{currentUser.name}</strong> ({currentUser.roleLabel})
             </p>
           </div>
-          <button
-            type="button"
-            className="btn btn-outline btn-sm no-print"
-            onClick={() => window.print()}
-          >
-            Print Profile
-          </button>
         </div>
 
         <article className="card profile-panel">

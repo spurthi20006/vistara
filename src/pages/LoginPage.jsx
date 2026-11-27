@@ -56,17 +56,6 @@ export function LoginPage() {
     });
   };
 
-  const handleQuickRole = (roleKey, presetEmail) => {
-    const user = loginAsRole(roleKey, presetEmail);
-    setSignedInUser(user);
-    setErrors({});
-    showToast({
-      type: 'success',
-      title: 'Role session switched',
-      message: `Now signed in as ${user.name} (${user.roleLabel}).`,
-    });
-  };
-
   const errorEntries = Object.entries(errors);
 
   return (
@@ -173,39 +162,6 @@ export function LoginPage() {
                   Sign In
                 </button>
               </form>
-
-              <div className="role-presets">
-                <p className="role-presets-title">Quick Campus Role Switch:</p>
-                <div className="card-actions-row">
-                  <button
-                    type="button"
-                    className="btn btn-outline btn-sm"
-                    onClick={() =>
-                      handleQuickRole('student', 'kabir.sharma@universityconnect.edu.in')
-                    }
-                  >
-                    Student Session
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-outline btn-sm"
-                    onClick={() =>
-                      handleQuickRole('alumni', 'aarav.mehta@universityconnect.edu.in')
-                    }
-                  >
-                    Alumni Session
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-outline btn-sm"
-                    onClick={() =>
-                      handleQuickRole('coordinator', 'kavita.rao@universityconnect.edu.in')
-                    }
-                  >
-                    Coordinator Session
-                  </button>
-                </div>
-              </div>
 
               <p className="auth-switch-link">
                 New to campus? <Link to="/register">Create a University Connect account</Link>

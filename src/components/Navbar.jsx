@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { useScrollPosition } from '../hooks/useScrollPosition';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -24,6 +24,9 @@ export function Navbar() {
   const { currentUser, logout } = useAppData();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const mobilePanelRef = useRef(null);
@@ -45,7 +48,7 @@ export function Navbar() {
 
   const roleNavItems = currentUser
     ? [...PUBLIC_NAV_ITEMS, { to: '/profile', label: 'My Profile' }]
-    : [...PUBLIC_NAV_ITEMS, { to: '/login', label: 'Login' }, { to: '/register', label: 'Register' }];
+    : PUBLIC_NAV_ITEMS;
 
   const handleLogout = () => {
     logout();
@@ -68,9 +71,11 @@ export function Navbar() {
           <span className="brand-text">University Connect</span>
         </Link>
 
-        <div className="navbar-desktop-search">
-          <SiteSearch />
-        </div>
+        {!isAuthPage && (
+          <div className="navbar-desktop-search">
+            <SiteSearch />
+          </div>
+        )}
 
         <div className="navbar-actions">
           <button
@@ -104,7 +109,7 @@ export function Navbar() {
             <span className="theme-toggle-text">{theme === 'dark' ? 'Light' : 'Dark'}</span>
           </button>
 
-          {currentUser && (
+          {currentUser ? (
             <button
               type="button"
               className="btn btn-outline btn-sm desktop-logout-btn"
@@ -112,46 +117,61 @@ export function Navbar() {
             >
               Sign out ({currentUser.roleLabel.split(' ')[0]})
             </button>
+          ) : (
+            <div className="navbar-auth-btns">
+              <Link to="/login" className="btn btn-outline btn-sm navbar-login-btn">
+                Login
+              </Link>
+              <Link to="/register" className="btn btn-primary btn-sm navbar-register-btn">
+                Sign Up
+              </Link>
+            </div>
           )}
 
-          <button
-            type="button"
-            className="hamburger-btn"
-            onClick={() => setMobileOpen(true)}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-nav-drawer"
-            aria-label="Open navigation menu"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M4 6h16M4 12h16M4 18h16"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div className="container navbar-mobile-search">
-        <SiteSearch />
-      </div>
-
-      <nav className="navbar-desktop-nav" aria-label="Main navigation">
-        <div className="container navbar-nav-list">
-          {roleNavItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => `nav-link ${isActive ? 'is-active' : ''}`}
+          {!isAuthPage && (
+            <button
+              type="button"
+              className="hamburger-btn"
+              onClick={() => setMobileOpen(true)}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav-drawer"
+              aria-label="Open navigation menu"
             >
-              {item.label}
-            </NavLink>
-          ))}
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M4 6h16M4 12h16M4 18h16"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          )}
         </div>
-      </nav>
+      </div>
+
+      {!isAuthPage && (
+        <>
+          <div className="container navbar-mobile-search">
+            <SiteSearch />
+          </div>
+
+          <nav className="navbar-desktop-nav" aria-label="Main navigation">
+            <div className="container navbar-nav-list">
+              {roleNavItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) => `nav-link ${isActive ? 'is-active' : ''}`}
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+          </nav>
+        </>
+      )}
 
       {mobileOpen && (
         <div

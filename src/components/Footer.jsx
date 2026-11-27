@@ -7,6 +7,10 @@ export function Footer() {
   const { currentUser } = useAppData();
   const currentYear = new Date().getFullYear();
 
+  if (currentUser) {
+    return null;
+  }
+
   return (
     <footer className="site-footer">
       <div className="container footer-grid">

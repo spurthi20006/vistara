@@ -104,6 +104,22 @@
   display: none;
 }
 
+/* Auth buttons: always visible in top bar */
+.navbar-auth-btns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.navbar-login-btn {
+  display: none;
+}
+
+.navbar-register-btn {
+  display: inline-flex;
+}
+
 .hamburger-btn {
   width: 44px;
   height: 44px;
@@ -168,6 +184,10 @@
 
   .theme-toggle-text {
     display: inline;
+  }
+
+  .navbar-login-btn {
+    display: inline-flex;
   }
 }
 

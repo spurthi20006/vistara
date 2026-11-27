@@ -74,13 +74,6 @@ export function ProfileDetailPage({ kind }) {
               </p>
               {kind === 'alumni' && <p className="profile-batch">{person.department}</p>}
             </div>
-            <button
-              type="button"
-              className="btn btn-outline btn-sm no-print"
-              onClick={() => window.print()}
-            >
-              Print Profile
-            </button>
           </header>
 
           <section aria-labelledby="bio-heading">
