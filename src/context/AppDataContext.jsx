@@ -15,6 +15,7 @@ const AppDataContext = createContext(null);
 const INITIAL_PEERS_BY_USER = {
   'stu-kabir-sharma': {
     'stu-devansh-verma': 'connected',
+    'alm-aarav-mehta': 'connected',
   },
   'alm-aarav-mehta': {
     'stu-kabir-sharma': 'connected',
@@ -81,21 +82,6 @@ const DEFAULT_MEMBER_PROFILES = {
     bio: 'Designs high-throughput payment settlement pipelines and mentors final-year undergraduates on system design interviews.',
     updatedAt: '2026-11-18',
   },
-  coordinator: {
-    id: 'coord-dr-kavita-rao',
-    name: 'Dr. Kavita Rao',
-    email: 'kavita.rao@universityconnect.edu.in',
-    role: 'coordinator',
-    roleLabel: 'Campus Coordinator',
-    usn: 'FAC-INNOV-04',
-    department: 'Student Innovation & Placement Cell',
-    yearOrBatch: 'Faculty Coordinator',
-    githubUrl: 'https://github.com/university-connect',
-    portfolioUrl: 'https://universityconnect.edu.in/innovation',
-    skills: ['Hackathon Operations', 'Industry Partnerships', 'Research Grants'],
-    bio: 'Coordinates annual campus hackathons, alumni mentoring cohorts, and interdisciplinary student capstone showcase grants.',
-    updatedAt: '2026-11-20',
-  },
 };
 
 export function AppDataProvider({ children }) {
@@ -115,7 +101,8 @@ export function AppDataProvider({ children }) {
 
   const loginAsRole = useCallback(
     (roleKey, customEmail) => {
-      const preset = DEFAULT_MEMBER_PROFILES[roleKey] || DEFAULT_MEMBER_PROFILES.student;
+      const safeRole = roleKey === 'alumni' ? 'alumni' : 'student';
+      const preset = DEFAULT_MEMBER_PROFILES[safeRole] || DEFAULT_MEMBER_PROFILES.student;
       const loggedUser = {
         ...preset,
         email: customEmail ? customEmail.trim() : preset.email,
@@ -335,37 +322,62 @@ export function AppDataProvider({ children }) {
   }, [peersByUser, currentUser]);
 
   const sendPeerRequest = useCallback(
-    (studentId) => {
-      if (!currentUser?.id || !studentId) return;
+    (targetId) => {
+      if (!currentUser?.id || !targetId || currentUser.id === targetId) return false;
+      let sent = false;
       setPeersByUser((prev) => {
-        const safePrev = prev && typeof prev === 'object' ? prev : {};
-        const userPeers = safePrev[currentUser.id] || {};
-        if (userPeers[studentId]) return safePrev;
-        return {
-          ...safePrev,
-          [currentUser.id]: {
-            ...userPeers,
-            [studentId]: 'pending',
-          },
-        };
+        const safePrev = prev && typeof prev === 'object' ? { ...prev } : {};
+        const userPeers = safePrev[currentUser.id] ? { ...safePrev[currentUser.id] } : {};
+        if (userPeers[targetId]) return safePrev;
+
+        userPeers[targetId] = 'pending';
+        safePrev[currentUser.id] = userPeers;
+
+        const targetPeers = safePrev[targetId] ? { ...safePrev[targetId] } : {};
+        targetPeers[currentUser.id] = 'incoming';
+        safePrev[targetId] = targetPeers;
+
+        sent = true;
+        return safePrev;
+      });
+      return sent;
+    },
+    [currentUser, setPeersByUser]
+  );
+
+  const acceptConnectionRequest = useCallback(
+    (targetId) => {
+      if (!currentUser?.id || !targetId) return;
+      setPeersByUser((prev) => {
+        const safePrev = prev && typeof prev === 'object' ? { ...prev } : {};
+        const userPeers = safePrev[currentUser.id] ? { ...safePrev[currentUser.id] } : {};
+        const targetPeers = safePrev[targetId] ? { ...safePrev[targetId] } : {};
+
+        userPeers[targetId] = 'connected';
+        targetPeers[currentUser.id] = 'connected';
+
+        safePrev[currentUser.id] = userPeers;
+        safePrev[targetId] = targetPeers;
+        return safePrev;
       });
     },
     [currentUser, setPeersByUser]
   );
 
   const removePeer = useCallback(
-    (studentId) => {
-      if (!currentUser?.id || !studentId) return;
+    (targetId) => {
+      if (!currentUser?.id || !targetId) return;
       setPeersByUser((prev) => {
-        const safePrev = prev && typeof prev === 'object' ? prev : {};
-        const userPeers = safePrev[currentUser.id];
-        if (!userPeers || !userPeers[studentId]) return safePrev;
-        const nextUserPeers = { ...userPeers };
-        delete nextUserPeers[studentId];
-        return {
-          ...safePrev,
-          [currentUser.id]: nextUserPeers,
-        };
+        const safePrev = prev && typeof prev === 'object' ? { ...prev } : {};
+        const userPeers = safePrev[currentUser.id] ? { ...safePrev[currentUser.id] } : {};
+        const targetPeers = safePrev[targetId] ? { ...safePrev[targetId] } : {};
+
+        delete userPeers[targetId];
+        delete targetPeers[currentUser.id];
+
+        safePrev[currentUser.id] = userPeers;
+        safePrev[targetId] = targetPeers;
+        return safePrev;
       });
     },
     [currentUser, setPeersByUser]
@@ -462,6 +474,10 @@ export function AppDataProvider({ children }) {
       toggleTeammateStatus,
       peers,
       sendPeerRequest,
+      sendConnectionRequest: sendPeerRequest,
+      acceptConnectionRequest,
+      rejectConnectionRequest: removePeer,
+      cancelConnectionRequest: removePeer,
       removePeer,
       messagesByThread,
       sendMessage,
@@ -493,6 +509,7 @@ export function AppDataProvider({ children }) {
       toggleTeammateStatus,
       peers,
       sendPeerRequest,
+      acceptConnectionRequest,
       removePeer,
       messagesByThread,
       sendMessage,

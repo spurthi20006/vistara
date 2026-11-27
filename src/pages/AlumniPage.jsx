@@ -2,17 +2,18 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { PageMeta } from '../components/PageMeta';
 import { SkeletonCard } from '../components/Skeleton';
+import { ConfirmModal } from '../components/ConfirmModal';
 import { useAppData } from '../context/AppDataContext';
 import { useToast } from '../hooks/useToast';
 import './DirectoryPages.css';
 
 export function AlumniPage() {
-  const { alumni, currentUser } = useAppData();
+  const { alumni, currentUser, peers, sendPeerRequest, acceptConnectionRequest, removePeer } = useAppData();
   const { showToast } = useToast();
   const [department, setDepartment] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [requestedIds, setRequestedIds] = useState([]);
+  const [pendingRemove, setPendingRemove] = useState(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsLoading(false), 380);
@@ -37,24 +38,66 @@ export function AlumniPage() {
     });
   }, [alumni, department, searchTerm]);
 
-  const handleRequestMentorship = (person) => {
-    if (currentUser?.role === 'alumni') {
-      return;
-    }
-    if (requestedIds.includes(person.id)) {
+  const handleConnectClick = (person) => {
+    if (!currentUser) {
       showToast({
         type: 'info',
-        title: 'Request already sent',
-        message: `You already requested a mentoring slot with ${person.name}.`,
+        title: 'Sign in required',
+        message: 'Please sign in to connect with alumni mentors.',
       });
       return;
     }
-    setRequestedIds((prev) => [...prev, person.id]);
+
+    if (currentUser.role === 'alumni') {
+      return;
+    }
+
+    const peerStatus = peers[person.id];
+    if (peerStatus === 'connected') {
+      setPendingRemove(person);
+      return;
+    }
+
+    if (peerStatus === 'pending') {
+      return;
+    }
+
+    if (peerStatus === 'incoming') {
+      acceptConnectionRequest(person.id);
+      showToast({
+        type: 'success',
+        title: 'Connection accepted',
+        message: `You are now connected with ${person.name}.`,
+      });
+      return;
+    }
+
+    sendPeerRequest(person.id);
     showToast({
       type: 'success',
-      title: 'Mentorship request sent',
-      message: `${person.name} (${person.company}) received your mentoring request.`,
+      title: 'Connection request sent',
+      message: `Connection request sent to ${person.name}.`,
     });
+  };
+
+  const handleCancelRequest = (person) => {
+    removePeer(person.id);
+    showToast({
+      type: 'info',
+      title: 'Request cancelled',
+      message: `Connection request to ${person.name} was cancelled.`,
+    });
+  };
+
+  const handleConfirmRemove = () => {
+    if (!pendingRemove) return;
+    removePeer(pendingRemove.id);
+    showToast({
+      type: 'info',
+      title: 'Connection removed',
+      message: `${pendingRemove.name} was removed from your connections.`,
+    });
+    setPendingRemove(null);
   };
 
   return (
@@ -131,7 +174,10 @@ export function AlumniPage() {
         ) : (
           <div className="card-grid">
             {filteredAlumni.map((person) => {
-              const requested = requestedIds.includes(person.id);
+              const peerStatus = peers[person.id];
+              const isPending = peerStatus === 'pending';
+              const isConnected = peerStatus === 'connected';
+              const isIncoming = peerStatus === 'incoming';
               return (
                 <article key={person.id} className="card card-interactive">
                   <div className="profile-card-head">
@@ -173,13 +219,56 @@ export function AlumniPage() {
                       </Link>
                     )}
                     {currentUser?.role !== 'alumni' && (
-                      <button
-                        type="button"
-                        className={`btn btn-sm ${requested ? 'btn-secondary' : 'btn-primary'}`}
-                        onClick={() => handleRequestMentorship(person)}
-                      >
-                        {requested ? 'Mentorship Requested' : 'Request Mentorship'}
-                      </button>
+                      <>
+                        {isIncoming ? (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-primary"
+                            onClick={() => {
+                              acceptConnectionRequest(person.id);
+                              showToast({
+                                type: 'success',
+                                title: 'Connection accepted',
+                                message: `You are now connected with ${person.name}.`,
+                              });
+                            }}
+                          >
+                            Accept
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className={`btn btn-sm ${
+                              isConnected
+                                ? 'btn-peer-connected'
+                                : isPending
+                                ? 'btn-secondary btn-peer-requested'
+                                : 'btn-primary'
+                            }`}
+                            disabled={isPending}
+                            onClick={() => handleConnectClick(person)}
+                            aria-label={
+                              isConnected
+                                ? `Connected with ${person.name}, click to remove`
+                                : isPending
+                                ? `Connection request sent to ${person.name}`
+                                : `Connect with ${person.name}`
+                            }
+                          >
+                            {isConnected ? 'Connected' : isPending ? 'Requested' : 'Connect'}
+                          </button>
+                        )}
+                        {isPending && (
+                          <button
+                            type="button"
+                            className="btn btn-outline btn-sm"
+                            onClick={() => handleCancelRequest(person)}
+                            aria-label={`Cancel request to ${person.name}`}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </article>
@@ -188,6 +277,21 @@ export function AlumniPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(pendingRemove)}
+        title="Remove connection?"
+        message={
+          pendingRemove
+            ? `Are you sure you want to remove ${pendingRemove.name} from your connections?`
+            : ''
+        }
+        confirmLabel="Remove Connection"
+        cancelLabel="Keep Connection"
+        variant="danger"
+        onConfirm={handleConfirmRemove}
+        onCancel={() => setPendingRemove(null)}
+      />
     </section>
   );
 }

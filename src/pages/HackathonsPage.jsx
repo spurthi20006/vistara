@@ -368,14 +368,9 @@ export function HackathonsPage() {
               <p className="page-subtitle">
                 {isCoordinator
                   ? 'Coordinator review controls enabled: approve or reject pending team submissions.'
-                  : 'Track submission status below. Coordinators can sign in to approve or reject pending entries.'}
+                  : 'Track submission status below.'}
               </p>
             </div>
-            {!isCoordinator && (
-              <Link to="/login" className="btn btn-outline btn-sm">
-                Sign in as Coordinator
-              </Link>
-            )}
           </div>
 
           <div className="card-grid">

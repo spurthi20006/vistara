@@ -61,7 +61,7 @@ export function LoginPage() {
     <section className="page-section">
       <PageMeta
         title="Member Login"
-        description="Sign in to University Connect as a student, alumni mentor, or campus coordinator."
+        description="Sign in to University Connect as a student or alumni mentor."
       />
       <div className="container auth-container">
         <div className="card auth-card">
@@ -95,14 +95,13 @@ export function LoginPage() {
                     onChange={(e) => setRoleChoice(e.target.value)}
                   >
                     <option value="student">Student</option>
-                    <option value="alumni">Alumni Mentor</option>
-                    <option value="coordinator">Campus Coordinator</option>
+                    <option value="alumni">Alumni</option>
                   </select>
                 </div>
 
                 <div className="form-field">
                   <label htmlFor="login-email" className="form-label">
-                    University Email
+                    Email
                   </label>
                   <input
                     ref={emailRef}

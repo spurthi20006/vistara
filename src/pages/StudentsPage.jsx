@@ -8,7 +8,7 @@ import { useToast } from '../hooks/useToast';
 import './DirectoryPages.css';
 
 export function StudentsPage() {
-  const { students, currentUser, peers, sendPeerRequest, removePeer } = useAppData();
+  const { students, currentUser, peers, sendPeerRequest, acceptConnectionRequest, removePeer } = useAppData();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [yearFilter, setYearFilter] = useState('All');
@@ -44,7 +44,7 @@ export function StudentsPage() {
       showToast({
         type: 'info',
         title: 'Sign in required',
-        message: 'Please sign in to connect with campus peers.',
+        message: 'Please sign in to connect with campus members.',
       });
       navigate('/login');
       return;
@@ -60,11 +60,30 @@ export function StudentsPage() {
       return;
     }
 
+    if (peerStatus === 'incoming') {
+      acceptConnectionRequest(student.id);
+      showToast({
+        type: 'success',
+        title: 'Connection accepted',
+        message: `You are now connected with ${student.name}.`,
+      });
+      return;
+    }
+
     sendPeerRequest(student.id);
     showToast({
       type: 'success',
-      title: 'Peer request sent',
-      message: `Peer request sent to ${student.name}.`,
+      title: 'Connection request sent',
+      message: `Connection request sent to ${student.name}.`,
+    });
+  };
+
+  const handleCancelRequest = (student) => {
+    removePeer(student.id);
+    showToast({
+      type: 'info',
+      title: 'Request cancelled',
+      message: `Connection request to ${student.name} was cancelled.`,
     });
   };
 
@@ -73,8 +92,8 @@ export function StudentsPage() {
     removePeer(pendingRemove.id);
     showToast({
       type: 'info',
-      title: 'Peer removed',
-      message: `${pendingRemove.name} was removed from your peers.`,
+      title: 'Connection removed',
+      message: `${pendingRemove.name} was removed from your connections.`,
     });
     setPendingRemove(null);
   };
@@ -154,6 +173,7 @@ export function StudentsPage() {
               const peerStatus = peers[student.id];
               const isPending = peerStatus === 'pending';
               const isConnected = peerStatus === 'connected';
+              const isIncoming = peerStatus === 'incoming';
 
               return (
                 <article key={student.id} className="card card-interactive">
@@ -191,27 +211,66 @@ export function StudentsPage() {
                         Message
                       </Link>
                     )}
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${
-                        isConnected
-                          ? 'btn-peer-connected'
-                          : isPending
-                          ? 'btn-secondary btn-peer-requested'
-                          : 'btn-primary'
-                      }`}
-                      disabled={isPending}
-                      onClick={() => handlePeerClick(student)}
-                      aria-label={
-                        isConnected
-                          ? `Connected peer ${student.name}, click to remove`
-                          : isPending
-                          ? `Peer request sent to ${student.name}`
-                          : `Add ${student.name} as peer`
-                      }
-                    >
-                      {isConnected ? 'Peers ✓' : isPending ? 'Request Sent' : 'Add Peer'}
-                    </button>
+                    {student.id !== currentUser?.id && (
+                      <>
+                        {isIncoming ? (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-primary"
+                            onClick={() => {
+                              acceptConnectionRequest(student.id);
+                              showToast({
+                                type: 'success',
+                                title: 'Connection accepted',
+                                message: `You are now connected with ${student.name}.`,
+                              });
+                            }}
+                          >
+                            Accept
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className={`btn btn-sm ${
+                              isConnected
+                                ? 'btn-peer-connected'
+                                : isPending
+                                ? 'btn-secondary btn-peer-requested'
+                                : 'btn-primary'
+                            }`}
+                            disabled={isPending}
+                            onClick={() => handlePeerClick(student)}
+                            aria-label={
+                              isConnected
+                                ? `Connected with ${student.name}, click to remove`
+                                : isPending
+                                ? `Connection request sent to ${student.name}`
+                                : currentUser?.role === 'student'
+                                ? `Add ${student.name} as peer`
+                                : `Connect with ${student.name}`
+                            }
+                          >
+                            {isConnected
+                              ? 'Connected'
+                              : isPending
+                              ? 'Requested'
+                              : currentUser?.role === 'student'
+                              ? 'Add Peer'
+                              : 'Connect'}
+                          </button>
+                        )}
+                        {isPending && (
+                          <button
+                            type="button"
+                            className="btn btn-outline btn-sm"
+                            onClick={() => handleCancelRequest(student)}
+                            aria-label={`Cancel request to ${student.name}`}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </>
+                    )}
                   </div>
                 </article>
               );
@@ -222,14 +281,14 @@ export function StudentsPage() {
 
       <ConfirmModal
         isOpen={Boolean(pendingRemove)}
-        title="Remove peer?"
+        title="Remove connection?"
         message={
           pendingRemove
-            ? `Are you sure you want to remove ${pendingRemove.name} from your connected peers?`
+            ? `Are you sure you want to remove ${pendingRemove.name} from your connections?`
             : ''
         }
-        confirmLabel="Remove Peer"
-        cancelLabel="Keep Peer"
+        confirmLabel="Remove Connection"
+        cancelLabel="Keep Connection"
         variant="danger"
         onConfirm={handleConfirmRemove}
         onCancel={() => setPendingRemove(null)}
