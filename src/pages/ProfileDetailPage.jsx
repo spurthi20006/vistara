@@ -7,7 +7,7 @@ import './ProfileDetailPage.css';
 
 export function ProfileDetailPage({ kind }) {
   const { id } = useParams();
-  const { alumni, students } = useAppData();
+  const { alumni, students, currentUser } = useAppData();
 
   const records = kind === 'alumni' ? alumni : students;
   const person = records.find((item) => item.id === id);
@@ -119,6 +119,30 @@ export function ProfileDetailPage({ kind }) {
                   <li key={interest}>{interest}</li>
                 ))}
               </ul>
+            </section>
+          )}
+
+          {kind === 'student' && currentUser?.role !== 'alumni' && (
+            <section aria-labelledby="hackathon-status-heading">
+              <h2 id="hackathon-status-heading" className="section-subheading">
+                Hackathon Teammate Compatibility
+              </h2>
+              <div className="hackathon-status-card">
+                <div className="status-info">
+                  <span className={`tag ${person.lookingForTeam ? 'badge-success' : 'badge-warning'}`}>
+                    {person.lookingForTeam ? '🟢 Looking for Teammates' : '⚪ Team Formed / Inactive'}
+                  </span>
+                  <p>
+                    Target Track:{' '}
+                    <strong>{person.preferredTrack || 'Campus Sustainability'}</strong>
+                  </p>
+                </div>
+                <div className="status-actions">
+                  <Link to="/hackathons" className="btn btn-primary btn-sm">
+                    Open Team Builder with {person.name.split(' ')[0]} →
+                  </Link>
+                </div>
+              </div>
             </section>
           )}
 

@@ -5,7 +5,7 @@ import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import './SiteSearch.css';
 
 export function SiteSearch({ onNavigate }) {
-  const { alumni, students, communities, projects, questions } = useAppData();
+  const { alumni, students, communities, projects, questions, currentUser } = useAppData();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef(null);
@@ -43,18 +43,20 @@ export function SiteSearch({ onNavigate }) {
       }
     });
 
-    communities.forEach((item) => {
-      const haystack = `${item.name} ${item.category} ${item.description}`.toLowerCase();
-      if (haystack.includes(trimmed)) {
-        matches.push({
-          id: item.id,
-          category: 'Community',
-          title: item.name,
-          subtitle: `${item.category} · ${item.membersCount} members`,
-          to: '/communities',
-        });
-      }
-    });
+    if (currentUser?.role !== 'alumni') {
+      communities.forEach((item) => {
+        const haystack = `${item.name} ${item.category} ${item.description}`.toLowerCase();
+        if (haystack.includes(trimmed)) {
+          matches.push({
+            id: item.id,
+            category: 'Community',
+            title: item.name,
+            subtitle: `${item.category} · ${item.membersCount} members`,
+            to: '/communities',
+          });
+        }
+      });
+    }
 
     projects.forEach((item) => {
       const haystack = `${item.title} ${item.domain} ${item.summary} ${item.techStack.join(' ')}`.toLowerCase();

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { PageMeta } from '../components/PageMeta';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { HackathonTeamMatcher } from '../components/HackathonTeamMatcher';
 import { useAppData } from '../context/AppDataContext';
 import { useToast } from '../hooks/useToast';
 import './HackathonsPage.css';
@@ -179,6 +180,13 @@ export function HackathonsPage() {
             );
           })}
         </div>
+
+        {/* Dynamic Hackathon Team Matcher & Skill Gap Analyzer */}
+        <HackathonTeamMatcher
+          onAddMemberToApplication={(student) => {
+            setMemberCount((prev) => String(Math.min(4, Number(prev || 1) + 1)));
+          }}
+        />
 
         <section className="card hackathon-form-card" aria-labelledby="apply-hackathon-heading">
           <h2 id="apply-hackathon-heading">

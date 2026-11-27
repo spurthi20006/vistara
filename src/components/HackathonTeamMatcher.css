@@ -1,0 +1,335 @@
+.hackathon-team-matcher {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  border: 2px solid var(--border-strong);
+  background-color: var(--bg-surface);
+}
+
+.matcher-title {
+  margin: var(--space-2) 0 var(--space-1);
+  font-size: 1.45rem;
+}
+
+.matcher-subtitle {
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 75ch;
+  font-size: 0.95rem;
+}
+
+.section-label {
+  margin: 0 0 var(--space-2);
+  font-size: 1.05rem;
+}
+
+/* Roster metrics */
+.roster-metrics {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+@media (min-width: 640px) {
+  .roster-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.metric-box {
+  background-color: var(--bg-surface-elevated);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.metric-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.metric-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.metric-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background-color: var(--bg-surface-alt);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-top: var(--space-2);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 300ms ease;
+}
+
+.missing-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+.all-covered-tag {
+  font-weight: 700;
+  color: var(--success-color);
+  font-size: 0.95rem;
+}
+
+/* Selected members strip */
+.selected-cards-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  .selected-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.selected-member-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-elevated);
+  border: 1.5px solid var(--border-color);
+  position: relative;
+}
+
+.member-mini-avatar {
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.member-dept {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.member-skills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+}
+
+.tag-xs {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.4rem;
+}
+
+.btn-remove-member {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.btn-remove-member:hover {
+  background-color: var(--error-bg);
+  color: var(--error-color);
+  border-color: var(--error-border);
+}
+
+.empty-roster-msg {
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Pillar breakdown grid */
+.pillars-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+@media (min-width: 500px) {
+  .pillars-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 800px) {
+  .pillars-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.pillar-card {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.pillar-card.is-covered {
+  background-color: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success-color);
+}
+
+.pillar-card.is-missing {
+  background-color: var(--warning-bg);
+  border-color: rgba(133, 77, 14, 0.4);
+  color: var(--warning-color);
+}
+
+.pillar-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.9rem;
+}
+
+.pillar-status-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Candidate pool grid */
+.candidates-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.candidates-sub {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.track-filter-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.candidates-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .candidates-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.candidate-card {
+  background-color: var(--bg-surface-elevated);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.candidate-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.candidate-avatar {
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  object-fit: cover;
+}
+
+.candidate-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.candidate-name {
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.candidate-name:hover {
+  text-decoration: underline;
+}
+
+.candidate-year-dept {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.status-badge {
+  align-self: flex-start;
+  font-size: 0.78rem;
+}
+
+.gap-filler-notice {
+  font-size: 0.82rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--accent-soft);
+  color: var(--text-primary);
+  border-left: 3px solid var(--indigo-800);
+}
+
+.candidate-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.candidate-actions {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}

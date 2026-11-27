@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { useScrollPosition } from '../hooks/useScrollPosition';
@@ -46,9 +46,16 @@ export function Navbar() {
     };
   }, [mobileOpen]);
 
-  const roleNavItems = currentUser
-    ? [...PUBLIC_NAV_ITEMS, { to: '/profile', label: 'My Profile' }]
-    : PUBLIC_NAV_ITEMS;
+  const roleNavItems = useMemo(() => {
+    let items = [...PUBLIC_NAV_ITEMS];
+    if (currentUser?.role === 'alumni') {
+      items = items.filter((item) => item.to !== '/communities' && item.to !== '/hackathons');
+    }
+    if (currentUser) {
+      items.push({ to: '/profile', label: 'My Profile' });
+    }
+    return items;
+  }, [currentUser]);
 
   const handleLogout = () => {
     logout();

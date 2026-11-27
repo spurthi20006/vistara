@@ -26,6 +26,9 @@ const DEFAULT_MEMBER_PROFILES = {
     githubUrl: 'https://github.com/kabir-sharma-dev',
     portfolioUrl: 'https://kabirsharma.dev',
     skills: ['React', 'Node.js', 'WebSockets', 'Docker'],
+    interests: ['Developer Tooling', 'Campus Transit Systems', 'Hackathons'],
+    lookingForTeam: true,
+    preferredTrack: 'Campus Sustainability',
     bio: 'Building real-time campus shuttle telemetry and organizing weekly peer code reviews for first-year students.',
     updatedAt: '2026-11-18',
   },
@@ -66,7 +69,7 @@ const DEFAULT_MEMBER_PROFILES = {
 export function AppDataProvider({ children }) {
   const [currentUser, setCurrentUser] = useLocalStorage('uc-current-user', null);
   const [alumni] = useState(INITIAL_ALUMNI);
-  const [students] = useState(INITIAL_STUDENTS);
+  const [students, setStudents] = useState(INITIAL_STUDENTS);
   const [communities, setCommunities] = useState(INITIAL_COMMUNITIES);
   const [projects, setProjects] = useState(INITIAL_PROJECTS);
   const [questions, setQuestions] = useState(INITIAL_QUESTIONS);
@@ -121,16 +124,35 @@ export function AppDataProvider({ children }) {
       setCurrentUser((prev) => {
         if (!prev) return prev;
         const cleanDigits = (updates.phoneDisplay || prev.phoneDisplay).replace(/[^\d+]/g, '');
-        return {
+        const updated = {
           ...prev,
           ...updates,
           phoneHref: `tel:${cleanDigits}`,
           updatedAt: new Date().toISOString().slice(0, 10),
         };
+        // Also update matching student record if current user is student
+        setStudents((sList) =>
+          sList.map((s) => (s.id === prev.id ? { ...s, ...updated } : s))
+        );
+        return updated;
       });
     },
     [setCurrentUser]
   );
+
+  const toggleTeammateStatus = useCallback((studentId) => {
+    setStudents((prev) =>
+      prev.map((s) =>
+        s.id === studentId ? { ...s, lookingForTeam: !s.lookingForTeam } : s
+      )
+    );
+    setCurrentUser((prev) => {
+      if (prev && prev.id === studentId) {
+        return { ...prev, lookingForTeam: !prev.lookingForTeam };
+      }
+      return prev;
+    });
+  }, [setCurrentUser]);
 
   const joinCommunity = useCallback((communityId) => {
     setCommunities((prev) =>
@@ -177,9 +199,18 @@ export function AppDataProvider({ children }) {
     [currentUser]
   );
 
-  const deleteProject = useCallback((projectId) => {
-    setProjects((prev) => prev.filter((p) => p.id !== projectId));
-  }, []);
+  const deleteProject = useCallback(
+    (projectId) => {
+      setProjects((prev) => {
+        const target = prev.find((p) => p.id === projectId);
+        if (target && target.ownerId && currentUser && target.ownerId !== currentUser.id) {
+          return prev;
+        }
+        return prev.filter((p) => p.id !== projectId);
+      });
+    },
+    [currentUser]
+  );
 
   const addQuestion = useCallback(
     (questionInput) => {
@@ -272,6 +303,7 @@ export function AppDataProvider({ children }) {
       applications,
       submitHackathonApplication,
       updateApplicationStatus,
+      toggleTeammateStatus,
     }),
     [
       currentUser,
@@ -295,6 +327,7 @@ export function AppDataProvider({ children }) {
       applications,
       submitHackathonApplication,
       updateApplicationStatus,
+      toggleTeammateStatus,
     ]
   );
 

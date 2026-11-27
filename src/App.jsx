@@ -33,10 +33,13 @@ function RouteEffects() {
   return null;
 }
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, disallowedRoles = [] }) {
   const { currentUser } = useAppData();
   if (!currentUser) {
     return <Navigate to="/login" replace />;
+  }
+  if (disallowedRoles.includes(currentUser.role)) {
+    return <Navigate to="/" replace />;
   }
   return children;
 }
@@ -58,11 +61,11 @@ export function App() {
                 <Route path="/alumni/:id" element={<ProtectedRoute><ProfileDetailPage kind="alumni" /></ProtectedRoute>} />
                 <Route path="/students" element={<ProtectedRoute><StudentsPage /></ProtectedRoute>} />
                 <Route path="/students/:id" element={<ProtectedRoute><ProfileDetailPage kind="student" /></ProtectedRoute>} />
-                <Route path="/communities" element={<ProtectedRoute><CommunitiesPage /></ProtectedRoute>} />
+                <Route path="/communities" element={<ProtectedRoute disallowedRoles={['alumni']}><CommunitiesPage /></ProtectedRoute>} />
                 <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
                 <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
                 <Route path="/questions" element={<ProtectedRoute><QuestionsPage /></ProtectedRoute>} />
-                <Route path="/hackathons" element={<ProtectedRoute><HackathonsPage /></ProtectedRoute>} />
+                <Route path="/hackathons" element={<ProtectedRoute disallowedRoles={['alumni']}><HackathonsPage /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><MyProfilePage /></ProtectedRoute>} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

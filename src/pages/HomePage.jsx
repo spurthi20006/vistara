@@ -45,10 +45,12 @@ export function HomePage() {
                 <dt>Active Students</dt>
                 <dd>{students.length}+</dd>
               </div>
-              <div className="hero-stat-item">
-                <dt>Campus Guilds</dt>
-                <dd>{communities.length}</dd>
-              </div>
+              {currentUser?.role !== 'alumni' && (
+                <div className="hero-stat-item">
+                  <dt>Campus Guilds</dt>
+                  <dd>{communities.length}</dd>
+                </div>
+              )}
               <div className="hero-stat-item">
                 <dt>Live Projects</dt>
                 <dd>{projects.length}</dd>
@@ -117,37 +119,39 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="page-section home-band-alt" aria-labelledby="communities-preview-heading">
-        <div className="container">
-          <div className="page-header-row">
-            <div className="page-header">
-              <h2 id="communities-preview-heading" className="page-title">
-                Active Campus Communities
-              </h2>
-              <p className="page-subtitle">
-                Join weekly study circles, hardware labs, and peer design critiques across campus.
-              </p>
+      {currentUser?.role !== 'alumni' && (
+        <section className="page-section home-band-alt" aria-labelledby="communities-preview-heading">
+          <div className="container">
+            <div className="page-header-row">
+              <div className="page-header">
+                <h2 id="communities-preview-heading" className="page-title">
+                  Active Campus Communities
+                </h2>
+                <p className="page-subtitle">
+                  Join weekly study circles, hardware labs, and peer design critiques across campus.
+                </p>
+              </div>
+              <Link to="/communities" className="btn btn-outline">
+                Browse Communities
+              </Link>
             </div>
-            <Link to="/communities" className="btn btn-outline">
-              Browse Communities
-            </Link>
-          </div>
 
-          <div className="card-grid">
-            {communities.slice(0, 3).map((community) => (
-              <article key={community.id} className="card card-interactive">
-                <div className="community-card-top">
-                  <span className="tag">{community.category}</span>
-                  <span className="card-meta-count">{community.membersCount} members</span>
-                </div>
-                <h3 className="card-heading">{community.name}</h3>
-                <p className="card-muted">{community.description}</p>
-                <p className="community-schedule">{community.meetingSchedule}</p>
-              </article>
-            ))}
+            <div className="card-grid">
+              {communities.slice(0, 3).map((community) => (
+                <article key={community.id} className="card card-interactive">
+                  <div className="community-card-top">
+                    <span className="tag">{community.category}</span>
+                    <span className="card-meta-count">{community.membersCount} members</span>
+                  </div>
+                  <h3 className="card-heading">{community.name}</h3>
+                  <p className="card-muted">{community.description}</p>
+                  <p className="community-schedule">{community.meetingSchedule}</p>
+                </article>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="page-section" aria-labelledby="faq-heading">
         <div className="container home-faq-container">
@@ -177,9 +181,11 @@ export function HomePage() {
             <Link to="/questions" className="btn btn-primary">
               Ask in Q&amp;A Forum
             </Link>
-            <Link to="/hackathons" className="btn btn-outline">
-              Explore Hackathons
-            </Link>
+            {currentUser?.role !== 'alumni' && (
+              <Link to="/hackathons" className="btn btn-outline">
+                Explore Hackathons
+              </Link>
+            )}
           </div>
         </div>
       </section>

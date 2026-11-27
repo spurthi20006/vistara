@@ -19,7 +19,7 @@ const EMPTY_PROJECT_FORM = {
 };
 
 export function ProjectsPage() {
-  const { projects, addProject, deleteProject } = useAppData();
+  const { currentUser, projects, addProject, deleteProject } = useAppData();
   const { showToast } = useToast();
   const [domainFilter, setDomainFilter] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
@@ -108,6 +108,15 @@ export function ProjectsPage() {
 
   const handleConfirmDelete = () => {
     if (!pendingDelete) return;
+    if (!currentUser || currentUser.id !== pendingDelete.ownerId) {
+      showToast({
+        type: 'error',
+        title: 'Action not allowed',
+        message: 'Only the project creator can delete this project.',
+      });
+      setPendingDelete(null);
+      return;
+    }
     deleteProject(pendingDelete.id);
     showToast({
       type: 'info',
@@ -416,13 +425,15 @@ export function ProjectsPage() {
                   <Link to={`/projects/${project.id}`} className="btn btn-primary btn-sm">
                     Inspect Project
                   </Link>
-                  <button
-                    type="button"
-                    className="btn btn-outline btn-sm"
-                    onClick={() => setPendingDelete(project)}
-                  >
-                    Delete Project
-                  </button>
+                  {currentUser && project.ownerId && currentUser.id === project.ownerId && (
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm"
+                      onClick={() => setPendingDelete(project)}
+                    >
+                      Delete Project
+                    </button>
+                  )}
                 </div>
               </article>
             ))}

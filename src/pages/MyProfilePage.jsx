@@ -8,7 +8,7 @@ import { formatLastUpdated } from '../utils/dateFormat';
 import './ProfileDetailPage.css';
 
 export function MyProfilePage() {
-  const { currentUser, updateCurrentUserProfile } = useAppData();
+  const { currentUser, updateCurrentUserProfile, toggleTeammateStatus, hackathons } = useAppData();
   const { showToast } = useToast();
 
   const [formState, setFormState] = useState(() => ({
@@ -19,6 +19,7 @@ export function MyProfilePage() {
     githubUrl: currentUser?.githubUrl || '',
     portfolioUrl: currentUser?.portfolioUrl || '',
     skillsText: currentUser?.skills ? currentUser.skills.join(', ') : '',
+    preferredTrack: currentUser?.preferredTrack || 'Campus Sustainability',
     bio: currentUser?.bio || '',
   }));
   const [errors, setErrors] = useState({});
@@ -113,6 +114,7 @@ export function MyProfilePage() {
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean),
+      preferredTrack: formState.preferredTrack,
       bio: formState.bio.trim(),
     });
 
@@ -144,6 +146,49 @@ export function MyProfilePage() {
         </div>
 
         <article className="card profile-panel">
+          {/* Hackathon Teammate Status Banner for Students */}
+          {currentUser.role === 'student' && (
+            <div className="hackathon-status-card">
+              <div className="status-info">
+                <span className="tag badge-success">Hackathon Teammate Matching</span>
+                <h3>
+                  Status:{' '}
+                  {currentUser.lookingForTeam ? (
+                    <span className="text-success">🟢 Actively Looking for a Team</span>
+                  ) : (
+                    <span className="text-muted">⚪ Team Formed / Not Looking</span>
+                  )}
+                </h3>
+                <p>
+                  Preferred Track:{' '}
+                  <strong>{currentUser.preferredTrack || 'Campus Sustainability'}</strong>. Visible to
+                  peers in the Hackathons team matching directory.
+                </p>
+              </div>
+              <div className="status-actions">
+                <button
+                  type="button"
+                  className={`btn btn-sm ${currentUser.lookingForTeam ? 'btn-secondary' : 'btn-primary'}`}
+                  onClick={() => {
+                    toggleTeammateStatus(currentUser.id);
+                    showToast({
+                      type: 'success',
+                      title: 'Teammate Status Updated',
+                      message: currentUser.lookingForTeam
+                        ? 'You are now marked as not looking for a team.'
+                        : 'You are now visible as actively seeking hackathon teammates!',
+                    });
+                  }}
+                >
+                  {currentUser.lookingForTeam ? 'Mark as Team Formed' : 'Mark as Looking for Team'}
+                </button>
+                <Link to="/hackathons" className="btn btn-outline btn-sm">
+                  Open Teammate Finder →
+                </Link>
+              </div>
+            </div>
+          )}
+
           <div className="profile-links-stack">
             <div className="link-row">
               <span>
@@ -335,6 +380,26 @@ export function MyProfilePage() {
                   onChange={(e) => setFormState({ ...formState, skillsText: e.target.value })}
                 />
               </div>
+
+              {currentUser.role === 'student' && (
+                <div className="form-field">
+                  <label htmlFor="prof-track" className="form-label">
+                    Preferred Hackathon Track
+                  </label>
+                  <select
+                    id="prof-track"
+                    className="form-select"
+                    value={formState.preferredTrack}
+                    onChange={(e) => setFormState({ ...formState, preferredTrack: e.target.value })}
+                  >
+                    <option value="Campus Sustainability">Campus Sustainability</option>
+                    <option value="Accessible EdTech">Accessible EdTech</option>
+                    <option value="Smart Hardware">Smart Hardware</option>
+                    <option value="Zero-Trust Auth">Zero-Trust Auth &amp; FinOps</option>
+                    <option value="Edge AI & Robotics">Edge AI &amp; Robotics</option>
+                  </select>
+                </div>
+              )}
 
               <div className="form-field">
                 <label htmlFor="prof-bio" className="form-label">

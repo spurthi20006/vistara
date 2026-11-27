@@ -12,7 +12,7 @@ import './ProjectsPage.css';
 export function ProjectDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { projects, deleteProject } = useAppData();
+  const { currentUser, projects, deleteProject } = useAppData();
   const { showToast } = useToast();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -42,7 +42,18 @@ export function ProjectDetailPage() {
     );
   }
 
+  const isOwner = Boolean(currentUser && project.ownerId && currentUser.id === project.ownerId);
+
   const handleConfirmDelete = () => {
+    if (!isOwner) {
+      showToast({
+        type: 'error',
+        title: 'Action not allowed',
+        message: 'Only the project creator can delete this project.',
+      });
+      setConfirmOpen(false);
+      return;
+    }
     deleteProject(project.id);
     setConfirmOpen(false);
     showToast({
@@ -61,15 +72,17 @@ export function ProjectDetailPage() {
           <Link to="/projects" className="btn btn-outline btn-sm">
             &larr; Back to Projects
           </Link>
-          <div className="card-actions-row">
-            <button
-              type="button"
-              className="btn btn-danger btn-sm"
-              onClick={() => setConfirmOpen(true)}
-            >
-              Delete Project
-            </button>
-          </div>
+          {isOwner && (
+            <div className="card-actions-row">
+              <button
+                type="button"
+                className="btn btn-danger btn-sm"
+                onClick={() => setConfirmOpen(true)}
+              >
+                Delete Project
+              </button>
+            </div>
+          )}
         </div>
 
         <article className="card profile-panel project-detail-card">
