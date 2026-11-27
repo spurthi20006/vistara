@@ -15,6 +15,7 @@ import { ProjectDetailPage } from './pages/ProjectDetailPage';
 import { QuestionsPage } from './pages/QuestionsPage';
 import { HackathonsPage } from './pages/HackathonsPage';
 import { MyProfilePage } from './pages/MyProfilePage';
+import { MessagesPage } from './pages/MessagesPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -66,6 +67,7 @@ export function App() {
                 <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
                 <Route path="/questions" element={<ProtectedRoute><QuestionsPage /></ProtectedRoute>} />
                 <Route path="/hackathons" element={<ProtectedRoute disallowedRoles={['alumni']}><HackathonsPage /></ProtectedRoute>} />
+                <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><MyProfilePage /></ProtectedRoute>} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

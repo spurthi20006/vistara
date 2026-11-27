@@ -24,6 +24,27 @@ const INITIAL_PEERS_BY_USER = {
   },
 };
 
+const INITIAL_MESSAGES_BY_THREAD = {
+  'alm-aarav-mehta__stu-kabir-sharma': [
+    {
+      id: 'msg-101',
+      senderId: 'stu-kabir-sharma',
+      senderName: 'Kabir Sharma',
+      senderRole: 'student',
+      text: 'Hi Aarav! I am working on our campus transit API and wanted your advice on structuring WebSocket updates cleanly.',
+      createdAt: '2026-11-26 17:40',
+    },
+    {
+      id: 'msg-102',
+      senderId: 'alm-aarav-mehta',
+      senderName: 'Aarav Mehta',
+      senderRole: 'alumni',
+      text: 'Hey Kabir! Happy to help. Keep your WebSocket fan-out decoupled from DB writes using a lightweight pub/sub channel—let me know when you want a quick architecture review.',
+      createdAt: '2026-11-26 18:05',
+    },
+  ],
+};
+
 const DEFAULT_MEMBER_PROFILES = {
   student: {
     id: 'stu-kabir-sharma',
@@ -31,10 +52,9 @@ const DEFAULT_MEMBER_PROFILES = {
     email: 'kabir.sharma@universityconnect.edu.in',
     role: 'student',
     roleLabel: 'Student',
+    usn: '1IP22CS042',
     department: 'Computer Science & Engineering',
     yearOrBatch: '4th Year B.Tech',
-    phoneDisplay: '+91 99104 38219',
-    phoneHref: 'tel:+919910438219',
     githubUrl: 'https://github.com/kabir-sharma-dev',
     portfolioUrl: 'https://kabirsharma.dev',
     skills: ['React', 'Node.js', 'WebSockets', 'Docker'],
@@ -52,10 +72,9 @@ const DEFAULT_MEMBER_PROFILES = {
     roleLabel: 'Alumni Mentor',
     jobRole: 'Senior Backend Engineer',
     company: 'Razorpay',
+    usn: '1IP16CS014',
     department: 'Computer Science & Engineering',
     yearOrBatch: 'Class of 2020',
-    phoneDisplay: '+91 98204 51731',
-    phoneHref: 'tel:+919820451731',
     githubUrl: 'https://github.com/aarav-mehta-uc',
     portfolioUrl: 'https://aaravmehta.dev',
     skills: ['Distributed Systems', 'Go', 'PostgreSQL', 'Kubernetes'],
@@ -68,10 +87,9 @@ const DEFAULT_MEMBER_PROFILES = {
     email: 'kavita.rao@universityconnect.edu.in',
     role: 'coordinator',
     roleLabel: 'Campus Coordinator',
+    usn: 'FAC-INNOV-04',
     department: 'Student Innovation & Placement Cell',
     yearOrBatch: 'Faculty Coordinator',
-    phoneDisplay: '+91 98102 64910',
-    phoneHref: 'tel:+919810264910',
     githubUrl: 'https://github.com/university-connect',
     portfolioUrl: 'https://universityconnect.edu.in/innovation',
     skills: ['Hackathon Operations', 'Industry Partnerships', 'Research Grants'],
@@ -90,6 +108,10 @@ export function AppDataProvider({ children }) {
   const [hackathons] = useState(INITIAL_HACKATHONS);
   const [applications, setApplications] = useState(INITIAL_HACKATHON_APPLICATIONS);
   const [peersByUser, setPeersByUser] = useLocalStorage('uc-peers-by-user', INITIAL_PEERS_BY_USER);
+  const [messagesByThread, setMessagesByThread] = useLocalStorage(
+    'uc-messages-by-thread',
+    INITIAL_MESSAGES_BY_THREAD
+  );
 
   const loginAsRole = useCallback(
     (roleKey, customEmail) => {
@@ -113,10 +135,9 @@ export function AppDataProvider({ children }) {
         email: payload.email.trim(),
         role: roleKey,
         roleLabel: roleKey === 'alumni' ? 'Alumni Mentor' : 'Student',
+        usn: payload.usn ? payload.usn.trim().toUpperCase() : '',
         department: payload.department,
         yearOrBatch: payload.graduationYear,
-        phoneDisplay: '+91 98204 51730',
-        phoneHref: 'tel:+919820451730',
         githubUrl: 'https://github.com/university-connect',
         portfolioUrl: 'https://universityconnect.edu.in',
         skills: ['Campus Member'],
@@ -138,11 +159,9 @@ export function AppDataProvider({ children }) {
     (updates) => {
       setCurrentUser((prev) => {
         if (!prev) return prev;
-        const cleanDigits = (updates.phoneDisplay || prev.phoneDisplay || '').replace(/[^\d+]/g, '');
         const updated = {
           ...prev,
           ...updates,
-          phoneHref: cleanDigits ? `tel:${cleanDigits}` : prev.phoneHref,
           updatedAt: new Date().toISOString().slice(0, 10),
         };
         // Also update matching student record if current user is student
@@ -154,11 +173,11 @@ export function AppDataProvider({ children }) {
           aList.map((a) =>
             a.id === prev.id
               ? {
-                  ...a,
-                  ...updated,
-                  role: updates.jobRole || a.role,
-                  company: updates.company || a.company,
-                }
+                ...a,
+                ...updated,
+                role: updates.jobRole || a.role,
+                company: updates.company || a.company,
+              }
               : a
           )
         );
@@ -352,6 +371,71 @@ export function AppDataProvider({ children }) {
     [currentUser, setPeersByUser]
   );
 
+  const sendMessage = useCallback(
+    ({ recipientId, studentId, alumniId, text }) => {
+      const targetId = recipientId || (currentUser?.id === studentId ? alumniId : studentId);
+      if (!currentUser?.id || !targetId) return null;
+      const trimmed = text.trim();
+      if (!trimmed) return null;
+
+      const threadKey = [currentUser.id, targetId].sort().join('__');
+      const now = new Date();
+      const timestamp = `${now.toISOString().slice(0, 10)} ${now.toTimeString().slice(0, 5)}`;
+      const newMessage = {
+        id: `msg-${Date.now()}`,
+        senderId: currentUser.id,
+        senderName: currentUser.name,
+        senderRole: currentUser.role,
+        text: trimmed,
+        createdAt: timestamp,
+      };
+
+      setMessagesByThread((prev) => {
+        const safePrev = prev && typeof prev === 'object' ? prev : {};
+        const existing = Array.isArray(safePrev[threadKey]) ? safePrev[threadKey] : [];
+        return {
+          ...safePrev,
+          [threadKey]: [...existing, newMessage],
+        };
+      });
+
+      return newMessage;
+    },
+    [currentUser, setMessagesByThread]
+  );
+
+  const deleteMessage = useCallback(
+    (recipientId, messageId) => {
+      if (!currentUser?.id || !recipientId || !messageId) return;
+      const threadKey = [currentUser.id, recipientId].sort().join('__');
+      setMessagesByThread((prev) => {
+        const safePrev = prev && typeof prev === 'object' ? prev : {};
+        const existing = Array.isArray(safePrev[threadKey]) ? safePrev[threadKey] : [];
+        const nextThread = existing.filter((m) => m.id !== messageId);
+        return {
+          ...safePrev,
+          [threadKey]: nextThread,
+        };
+      });
+    },
+    [currentUser, setMessagesByThread]
+  );
+
+  const clearThreadHistory = useCallback(
+    (recipientId) => {
+      if (!currentUser?.id || !recipientId) return;
+      const threadKey = [currentUser.id, recipientId].sort().join('__');
+      setMessagesByThread((prev) => {
+        const safePrev = prev && typeof prev === 'object' ? prev : {};
+        if (!safePrev[threadKey]) return safePrev;
+        const next = { ...safePrev };
+        delete next[threadKey];
+        return next;
+      });
+    },
+    [currentUser, setMessagesByThread]
+  );
+
   const value = useMemo(
     () => ({
       currentUser,
@@ -379,6 +463,10 @@ export function AppDataProvider({ children }) {
       peers,
       sendPeerRequest,
       removePeer,
+      messagesByThread,
+      sendMessage,
+      deleteMessage,
+      clearThreadHistory,
     }),
     [
       currentUser,
@@ -406,6 +494,10 @@ export function AppDataProvider({ children }) {
       peers,
       sendPeerRequest,
       removePeer,
+      messagesByThread,
+      sendMessage,
+      deleteMessage,
+      clearThreadHistory,
     ]
   );
 

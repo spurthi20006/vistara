@@ -1,14 +1,13 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { PageMeta } from '../components/PageMeta';
-import { CopyButton } from '../components/CopyButton';
 import { useAppData } from '../context/AppDataContext';
 import { useToast } from '../hooks/useToast';
 import { formatLastUpdated } from '../utils/dateFormat';
 import './ProfileDetailPage.css';
 
 export function MyProfilePage() {
-  const { currentUser, updateCurrentUserProfile, toggleTeammateStatus, hackathons } = useAppData();
+  const { currentUser, updateCurrentUserProfile } = useAppData();
   const { showToast } = useToast();
 
   const isAlumni = currentUser?.role === 'alumni';
@@ -18,12 +17,17 @@ export function MyProfilePage() {
     email: currentUser?.email || '',
     jobRole: currentUser?.jobRole || (isAlumni ? 'Senior Backend Engineer' : ''),
     company: currentUser?.company || (isAlumni ? 'Razorpay' : ''),
-    phoneDisplay: currentUser?.phoneDisplay || '',
+    usn:
+      currentUser?.usn ||
+      (currentUser?.id === 'stu-kabir-sharma'
+        ? '1IP22CS042'
+        : currentUser?.id === 'alm-aarav-mehta'
+        ? '1IP16CS014'
+        : ''),
     department: currentUser?.department || '',
     githubUrl: currentUser?.githubUrl || '',
     portfolioUrl: currentUser?.portfolioUrl || '',
     skillsText: currentUser?.skills ? currentUser.skills.join(', ') : '',
-    preferredTrack: currentUser?.preferredTrack || 'Campus Sustainability',
     bio: currentUser?.bio || '',
   }));
   const [errors, setErrors] = useState({});
@@ -34,7 +38,7 @@ export function MyProfilePage() {
     email: useRef(null),
     jobRole: useRef(null),
     company: useRef(null),
-    phoneDisplay: useRef(null),
+    usn: useRef(null),
     githubUrl: useRef(null),
     portfolioUrl: useRef(null),
     bio: useRef(null),
@@ -83,8 +87,8 @@ export function MyProfilePage() {
       if (formState.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email.trim())) {
         nextErrors.email = 'Enter a valid email address.';
       }
-      if (formState.phoneDisplay.trim() && !/^\+?[\d\s-]{8,18}$/.test(formState.phoneDisplay.trim())) {
-        nextErrors.phoneDisplay = 'Enter a valid phone number (e.g. +91 98204 51730).';
+      if (formState.usn.trim() && !/^[A-Za-z0-9-]{5,20}$/.test(formState.usn.trim())) {
+        nextErrors.usn = 'Enter a valid USN (5-20 alphanumeric characters, e.g. 1IP22CS042).';
       }
       if (formState.githubUrl.trim() && !/^https?:\/\/.+/i.test(formState.githubUrl.trim())) {
         nextErrors.githubUrl = 'Enter a valid GitHub URL starting with https:// or http://.';
@@ -100,8 +104,8 @@ export function MyProfilePage() {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email.trim())) {
         nextErrors.email = 'Enter a valid email address.';
       }
-      if (!/^\+?[\d\s-]{8,18}$/.test(formState.phoneDisplay.trim())) {
-        nextErrors.phoneDisplay = 'Enter a valid phone number including country code (e.g. +91 98204 51730).';
+      if (!/^[A-Za-z0-9-]{5,20}$/.test(formState.usn.trim())) {
+        nextErrors.usn = 'Enter a valid USN (5-20 alphanumeric characters, e.g. 1IP22CS042).';
       }
       if (!/^https?:\/\/.+/i.test(formState.githubUrl.trim())) {
         nextErrors.githubUrl = 'Enter a valid GitHub URL starting with https:// or http://.';
@@ -141,7 +145,7 @@ export function MyProfilePage() {
       email: formState.email.trim() || currentUser.email,
       jobRole: formState.jobRole.trim(),
       company: formState.company.trim(),
-      phoneDisplay: formState.phoneDisplay.trim(),
+      usn: formState.usn.trim().toUpperCase(),
       department: formState.department.trim(),
       githubUrl: formState.githubUrl.trim(),
       portfolioUrl: formState.portfolioUrl.trim(),
@@ -149,7 +153,6 @@ export function MyProfilePage() {
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean),
-      preferredTrack: formState.preferredTrack,
       bio: formState.bio.trim(),
     });
 
@@ -191,76 +194,6 @@ export function MyProfilePage() {
               </h2>
             </div>
           )}
-
-          {/* Hackathon Teammate Status Banner for Students */}
-          {currentUser.role === 'student' && (
-            <div className="hackathon-status-card">
-              <div className="status-info">
-                <span className="tag badge-success">Hackathon Teammate Matching</span>
-                <h3>
-                  Status:{' '}
-                  {currentUser.lookingForTeam ? (
-                    <span className="text-success">🟢 Actively Looking for a Team</span>
-                  ) : (
-                    <span className="text-muted">⚪ Team Formed / Not Looking</span>
-                  )}
-                </h3>
-                <p>
-                  Preferred Track:{' '}
-                  <strong>{currentUser.preferredTrack || 'Campus Sustainability'}</strong>. Visible to
-                  peers in the Hackathons team matching directory.
-                </p>
-              </div>
-              <div className="status-actions">
-                <button
-                  type="button"
-                  className={`btn btn-sm ${currentUser.lookingForTeam ? 'btn-secondary' : 'btn-primary'}`}
-                  onClick={() => {
-                    toggleTeammateStatus(currentUser.id);
-                    showToast({
-                      type: 'success',
-                      title: 'Teammate Status Updated',
-                      message: currentUser.lookingForTeam
-                        ? 'You are now marked as not looking for a team.'
-                        : 'You are now visible as actively seeking hackathon teammates!',
-                    });
-                  }}
-                >
-                  {currentUser.lookingForTeam ? 'Mark as Team Formed' : 'Mark as Looking for Team'}
-                </button>
-                <Link to="/hackathons" className="btn btn-outline btn-sm">
-                  Open Teammate Finder →
-                </Link>
-              </div>
-            </div>
-          )}
-
-          <div className="profile-links-stack">
-            <div className="link-row">
-              <span>
-                Email: <a href={`mailto:${currentUser.email}`}>{currentUser.email}</a>
-              </span>
-              <CopyButton text={currentUser.email} label="Copy email" />
-            </div>
-            <div className="link-row">
-              <span>
-                Phone: <a href={currentUser.phoneHref}>{currentUser.phoneDisplay}</a>
-              </span>
-              <CopyButton text={currentUser.phoneDisplay} label="Copy phone number" />
-            </div>
-            <div className="link-row">
-              <a href={currentUser.githubUrl} target="_blank" rel="noopener noreferrer">
-                GitHub: {currentUser.githubUrl}
-              </a>
-              <CopyButton text={currentUser.githubUrl} label="Copy GitHub link" />
-            </div>
-            <div className="link-row">
-              <a href={currentUser.portfolioUrl} target="_blank" rel="noopener noreferrer">
-                Portfolio: {currentUser.portfolioUrl}
-              </a>
-              <CopyButton text={currentUser.portfolioUrl} label="Copy portfolio link" />
-            </div>
-          </div>
 
           {savedSuccess ? (
             <div className="form-success-card" role="status">
@@ -386,22 +319,23 @@ export function MyProfilePage() {
 
               <div className="two-col-grid">
                 <div className="form-field">
-                  <label htmlFor="prof-phone" className="form-label">
-                    Phone Number {isAlumni && <span className="field-optional">(Optional)</span>}
+                  <label htmlFor="prof-usn" className="form-label">
+                    USN {isAlumni && <span className="field-optional">(Optional)</span>}
                   </label>
                   <input
-                    ref={refs.phoneDisplay}
-                    id="prof-phone"
-                    type="tel"
-                    className={`form-input ${errors.phoneDisplay ? 'input-invalid' : ''}`}
-                    value={formState.phoneDisplay}
-                    onChange={(e) => setFormState({ ...formState, phoneDisplay: e.target.value })}
-                    aria-invalid={Boolean(errors.phoneDisplay)}
-                    aria-describedby={errors.phoneDisplay ? 'prof-phone-err' : undefined}
+                    ref={refs.usn}
+                    id="prof-usn"
+                    type="text"
+                    className={`form-input ${errors.usn ? 'input-invalid' : ''}`}
+                    value={formState.usn}
+                    onChange={(e) => setFormState({ ...formState, usn: e.target.value })}
+                    aria-invalid={Boolean(errors.usn)}
+                    aria-describedby={errors.usn ? 'prof-usn-err' : undefined}
+                    placeholder="e.g. 1IP22CS042"
                   />
-                  {errors.phoneDisplay && (
-                    <span id="prof-phone-err" className="field-error">
-                      {errors.phoneDisplay}
+                  {errors.usn && (
+                    <span id="prof-usn-err" className="field-error">
+                      {errors.usn}
                     </span>
                   )}
                 </div>
@@ -476,26 +410,6 @@ export function MyProfilePage() {
                   onChange={(e) => setFormState({ ...formState, skillsText: e.target.value })}
                 />
               </div>
-
-              {currentUser.role === 'student' && (
-                <div className="form-field">
-                  <label htmlFor="prof-track" className="form-label">
-                    Preferred Hackathon Track
-                  </label>
-                  <select
-                    id="prof-track"
-                    className="form-select"
-                    value={formState.preferredTrack}
-                    onChange={(e) => setFormState({ ...formState, preferredTrack: e.target.value })}
-                  >
-                    <option value="Campus Sustainability">Campus Sustainability</option>
-                    <option value="Accessible EdTech">Accessible EdTech</option>
-                    <option value="Smart Hardware">Smart Hardware</option>
-                    <option value="Zero-Trust Auth">Zero-Trust Auth &amp; FinOps</option>
-                    <option value="Edge AI & Robotics">Edge AI &amp; Robotics</option>
-                  </select>
-                </div>
-              )}
 
               <div className="form-field">
                 <label htmlFor="prof-bio" className="form-label">

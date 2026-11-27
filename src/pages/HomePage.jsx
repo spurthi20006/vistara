@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
 import { PageMeta } from '../components/PageMeta';
-import { FaqAccordion } from '../components/FaqAccordion';
 import { CopyButton } from '../components/CopyButton';
 import { useAppData } from '../context/AppDataContext';
-import { LANDING_FAQS, UNIVERSITY_CONTACT } from '../data/mockData';
+import { UNIVERSITY_CONTACT } from '../data/mockData';
 import './HomePage.css';
 
 export function HomePage() {
@@ -152,20 +151,6 @@ export function HomePage() {
           </div>
         </section>
       )}
-
-      <section className="page-section" aria-labelledby="faq-heading">
-        <div className="container home-faq-container">
-          <div className="page-header">
-            <h2 id="faq-heading" className="page-title">
-              Frequently Asked Questions
-            </h2>
-            <p className="page-subtitle">
-              Answers about joining University Connect, alumni mentoring, and project submissions.
-            </p>
-          </div>
-          <FaqAccordion items={LANDING_FAQS} />
-        </div>
-      </section>
 
       <section className="page-section home-cta-band" aria-labelledby="campus-help-heading">
         <div className="container home-cta-card">

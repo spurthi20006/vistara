@@ -16,6 +16,7 @@ const PUBLIC_NAV_ITEMS = [
   { to: '/projects', label: 'Projects' },
   { to: '/questions', label: 'Q&A' },
   { to: '/hackathons', label: 'Hackathons' },
+  { to: '/messages', label: 'Messages' },
 ];
 
 export function Navbar() {

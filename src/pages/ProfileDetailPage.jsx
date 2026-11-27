@@ -46,13 +46,18 @@ export function ProfileDetailPage({ kind }) {
         description={person.bio}
       />
       <div className="container profile-detail-container">
-        <div className="no-print">
+        <div className="page-header-row no-print">
           <Link
             to={kind === 'alumni' ? '/alumni' : '/students'}
             className="btn btn-outline btn-sm"
           >
             &larr; Back to {kind === 'alumni' ? 'Alumni' : 'Students'}
           </Link>
+          {person.id !== currentUser?.id && (
+            <Link to={`/messages?to=${person.id}`} className="btn btn-primary btn-sm">
+              Message {person.name.split(' ')[0]}
+            </Link>
+          )}
         </div>
 
         <article className="card profile-panel">
@@ -156,12 +161,6 @@ export function ProfileDetailPage({ kind }) {
                   Email: <a href={`mailto:${person.email}`}>{person.email}</a>
                 </span>
                 <CopyButton text={person.email} label="Copy email address" />
-              </div>
-              <div className="link-row">
-                <span>
-                  Phone: <a href={person.phoneHref}>{person.phoneDisplay}</a>
-                </span>
-                <CopyButton text={person.phoneDisplay} label="Copy phone number" />
               </div>
               <div className="link-row">
                 <a href={person.githubUrl} target="_blank" rel="noopener noreferrer">

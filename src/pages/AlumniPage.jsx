@@ -167,6 +167,11 @@ export function AlumniPage() {
                     <Link to={`/alumni/${person.id}`} className="btn btn-outline btn-sm">
                       View Profile
                     </Link>
+                    {person.id !== currentUser?.id && (
+                      <Link to={`/messages?to=${person.id}`} className="btn btn-outline btn-sm">
+                        Message
+                      </Link>
+                    )}
                     {currentUser?.role !== 'alumni' && (
                       <button
                         type="button"

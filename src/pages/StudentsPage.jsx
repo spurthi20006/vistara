@@ -186,6 +186,11 @@ export function StudentsPage() {
                     <Link to={`/students/${student.id}`} className="btn btn-primary btn-sm">
                       Open Student Profile
                     </Link>
+                    {student.id !== currentUser?.id && (
+                      <Link to={`/messages?to=${student.id}`} className="btn btn-outline btn-sm">
+                        Message
+                      </Link>
+                    )}
                     <button
                       type="button"
                       className={`btn btn-sm ${
