@@ -12,6 +12,18 @@ import {
 
 const AppDataContext = createContext(null);
 
+const INITIAL_PEERS_BY_USER = {
+  'stu-kabir-sharma': {
+    'stu-devansh-verma': 'connected',
+  },
+  'alm-aarav-mehta': {
+    'stu-kabir-sharma': 'connected',
+  },
+  'coord-dr-kavita-rao': {
+    'stu-kabir-sharma': 'connected',
+  },
+};
+
 const DEFAULT_MEMBER_PROFILES = {
   student: {
     id: 'stu-kabir-sharma',
@@ -77,6 +89,7 @@ export function AppDataProvider({ children }) {
   const [questions, setQuestions] = useState(INITIAL_QUESTIONS);
   const [hackathons] = useState(INITIAL_HACKATHONS);
   const [applications, setApplications] = useState(INITIAL_HACKATHON_APPLICATIONS);
+  const [peersByUser, setPeersByUser] = useLocalStorage('uc-peers-by-user', INITIAL_PEERS_BY_USER);
 
   const loginAsRole = useCallback(
     (roleKey, customEmail) => {
@@ -295,6 +308,50 @@ export function AppDataProvider({ children }) {
     );
   }, []);
 
+  const peers = useMemo(() => {
+    if (!currentUser?.id || !peersByUser || typeof peersByUser !== 'object') {
+      return {};
+    }
+    return peersByUser[currentUser.id] || {};
+  }, [peersByUser, currentUser]);
+
+  const sendPeerRequest = useCallback(
+    (studentId) => {
+      if (!currentUser?.id || !studentId) return;
+      setPeersByUser((prev) => {
+        const safePrev = prev && typeof prev === 'object' ? prev : {};
+        const userPeers = safePrev[currentUser.id] || {};
+        if (userPeers[studentId]) return safePrev;
+        return {
+          ...safePrev,
+          [currentUser.id]: {
+            ...userPeers,
+            [studentId]: 'pending',
+          },
+        };
+      });
+    },
+    [currentUser, setPeersByUser]
+  );
+
+  const removePeer = useCallback(
+    (studentId) => {
+      if (!currentUser?.id || !studentId) return;
+      setPeersByUser((prev) => {
+        const safePrev = prev && typeof prev === 'object' ? prev : {};
+        const userPeers = safePrev[currentUser.id];
+        if (!userPeers || !userPeers[studentId]) return safePrev;
+        const nextUserPeers = { ...userPeers };
+        delete nextUserPeers[studentId];
+        return {
+          ...safePrev,
+          [currentUser.id]: nextUserPeers,
+        };
+      });
+    },
+    [currentUser, setPeersByUser]
+  );
+
   const value = useMemo(
     () => ({
       currentUser,
@@ -319,6 +376,9 @@ export function AppDataProvider({ children }) {
       submitHackathonApplication,
       updateApplicationStatus,
       toggleTeammateStatus,
+      peers,
+      sendPeerRequest,
+      removePeer,
     }),
     [
       currentUser,
@@ -343,6 +403,9 @@ export function AppDataProvider({ children }) {
       submitHackathonApplication,
       updateApplicationStatus,
       toggleTeammateStatus,
+      peers,
+      sendPeerRequest,
+      removePeer,
     ]
   );
 

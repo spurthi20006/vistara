@@ -46,3 +46,17 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+.btn-peer-requested:disabled {
+  opacity: 0.72;
+}
+
+.btn-peer-connected {
+  background-color: var(--success-bg);
+  color: var(--success-color);
+  border-color: var(--success-border);
+}
+
+.btn-peer-connected:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
